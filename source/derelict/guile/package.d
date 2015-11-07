@@ -13,7 +13,6 @@ private {
 
 }
 
-public import derelict.guile.types;
 public import derelict.guile.array_handle;
 public import derelict.guile.boolean;
 public import derelict.guile.dynstack;
@@ -24,6 +23,7 @@ public import derelict.guile.print;
 public import derelict.guile.strings;
 public import derelict.guile.tags;
 public import derelict.guile.throwh;
+public import derelict.guile.types;
 
 extern(C) @nogc nothrow {
 
@@ -36,10 +36,7 @@ extern(C) @nogc nothrow {
 	//6.6.1 Booleans
 	alias da_scm_not = SCM function(SCM x);
 	alias da_scm_boolean_p = SCM function(SCM obj);
-	alias da_scm_is_true = int function(SCM obj);
-	alias da_scm_is_false = int function(SCM obj);
 	alias da_scm_is_bool = int function(SCM obj);
-	alias da_scm_from_bool = SCM function(int val);
 	alias da_scm_to_bool = int function(SCM val);
 
 	//6.6.2.2 Integers
@@ -55,20 +52,6 @@ extern(C) @nogc nothrow {
 	alias da_scm_to_unsigned_integer = scm_t_uintmax function(SCM x, scm_t_uintmax min, scm_t_uintmax max);
 	alias da_scm_from_signed_integer = SCM function(scm_t_intmax x);
 	alias da_scm_from_unsigned_integer = SCM function(scm_t_uintmax x);
-	alias da_scm_to_char = char function(SCM x);
-	alias da_scm_to_schar = byte function(SCM x);
-	alias da_scm_to_uchar = ubyte function(SCM x);
-	alias da_scm_to_short = short function(SCM x);
-	alias da_scm_to_ushort = ushort function(SCM x);
-	alias da_scm_to_int = int function(SCM x);
-	alias da_scm_to_uint = uint function(SCM x);
-	alias da_scm_to_long = c_long function(SCM x);
-	alias da_scm_to_ulong = c_ulong function(SCM y);
-	alias da_scm_to_long_long = long function(SCM x);
-	alias da_scm_to_ulong_long = ulong function(SCM x);
-	alias da_scm_to_size_t = size_t function(SCM x);
-	alias da_scm_to_ssize_t = ssize_t function(SCM x);
-	alias da_scm_to_ptrdiff_t = scm_t_ptrdiff function(SCM x);
 	alias da_scm_to_int8 = scm_t_int8 function(SCM x);
 	alias da_scm_to_uint8 = scm_t_uint8 function(SCM x);
 	alias da_scm_to_int16 = scm_t_int16 function(SCM x);
@@ -77,23 +60,7 @@ extern(C) @nogc nothrow {
 	alias da_scm_to_uint32 = scm_t_uint32 function(SCM x);
 	alias da_scm_to_int64 = scm_t_int64 function(SCM x);
 	alias da_scm_to_uint64 = scm_t_uint64 function(SCM x);
-	alias da_scm_to_intmax = scm_t_intmax function(SCM x);
-	alias da_scm_to_uintmax = scm_t_uintmax function(SCM x);
 
-	alias da_scm_from_char = SCM function(char x);
-	alias da_scm_from_schar = SCM function(byte x);
-	alias da_scm_from_uchar = SCM function(ubyte x);
-	alias da_scm_from_short = SCM function(short x);
-	alias da_scm_from_ushort = SCM function(ushort x);
-	alias da_scm_from_int = SCM function(int x);
-	alias da_scm_from_uint = SCM function(uint x);
-	alias da_scm_from_long = SCM function(long x);
-	alias da_scm_from_ulong = SCM function(ulong x);
-	alias da_scm_from_long_long = SCM function(long x);
-	alias da_scm_from_ulong_long = SCM function(ulong x);
-	alias da_scm_from_size_t = SCM function(size_t x);
-	alias da_scm_from_ssize_t = SCM function(ssize_t x);
-	alias da_scm_from_ptrdiff_t = SCM function(ptrdiff_t x);
 	alias da_scm_from_int8 = SCM function(scm_t_int8 x);
 	alias da_scm_from_uint8 = SCM function(scm_t_uint8 x);
 	alias da_scm_from_int16 = SCM function(scm_t_int16 x);
@@ -102,8 +69,6 @@ extern(C) @nogc nothrow {
 	alias da_scm_from_uint32 = SCM function(scm_t_uint32 x);
 	alias da_scm_from_int64 = SCM function(scm_t_int64 x);
 	alias da_scm_from_uint64 = SCM function(scm_t_uint64 x);
-	alias da_scm_from_intmax = SCM function(scm_t_intmax x);
-	alias da_scm_from_uintmax = SCM function(scm_t_uintmax x);
 
 	/* not included FOR NOW
 	alias da_scm_to_mpz = void function(SCM val, mpz_t rop);
@@ -217,7 +182,7 @@ extern(C) @nogc nothrow {
 	//6.6.2.12 Bitwise Operations
 	alias da_scm_logand = SCM function(SCM n1, SCM n2);
 	alias da_scm_logior = SCM function(SCM n1, SCM n2);
-	alias da_scm_loxor = SCM function(SCM n1, SCM n2);
+	alias da_scm_logxor = SCM function(SCM n1, SCM n2);
 	alias da_scm_lognot = SCM function(SCM n);
 	alias da_scm_logtest = SCM function(SCM j, SCM k);
 	alias da_scm_logbit_p = SCM function(SCM index, SCM j);
@@ -551,7 +516,6 @@ extern(C) @nogc nothrow {
 
 	//6.6.7.4 Operations Related to Symbols
 	alias da_scm_symbol_p = SCM function(SCM obj);
-	alias da_scm_is_symbol = int function(SCM val);
 	alias da_scm_symbol_to_string = SCM function(SCM s);
 	alias da_scm_string_to_symbol = SCM function(SCM str);
 	alias da_scm_string_ci_to_symbol = SCM function(SCM str);
@@ -625,7 +589,6 @@ extern(C) @nogc nothrow {
 	//6.7.2.2 List Predicates
 	alias da_scm_list_p = SCM function(SCM x);
 	alias da_scm_null_p = SCM function(SCM x);
-	alias da_scm_is_null = int function(SCM x);
 
 	//6.7.2.3 List Constructors
 	alias da_scm_list_1 = SCM function(SCM elem1);
@@ -755,8 +718,6 @@ extern(C) @nogc nothrow {
 	//6.7.5.4 Accessing Arrays from C
 	alias da_scm_array_get_handle = void function(SCM array, scm_t_array_handle * handle);
 	alias da_scm_array_handle_release = void function(scm_t_array_handle * handle);
-	alias da_scm_array_handle_rank = size_t function(scm_t_array_handle * handle);
-	alias da_scm_array_handle_dims = const scm_t_array_dim * function(scm_t_array_handle * handle);
 	alias da_scm_array_handle_pos = ssize_t function(scm_t_array_handle * handle, SCM indices);
 	alias da_scm_array_handle_ref = SCM function(scm_t_array_handle * handle, ssize_t pos);
 	alias da_scm_array_handle_set = void function(scm_t_array_handle * handle, ssize_t pos, SCM val);
@@ -879,7 +840,6 @@ extern(C) @nogc nothrow {
 	alias da_scm_program_objcode = SCM function(SCM program);
 	alias da_scm_program_objects = SCM function(SCM program);
 	alias da_scm_program_module = SCM function(SCM program);
-	alias da_scm_program_free_variables = SCM function(SCM program);
 	alias da_scm_program_meta = SCM function(SCM program);
 	alias da_scm_program_arities = SCM function(SCM program);
 
@@ -908,7 +868,6 @@ extern(C) @nogc nothrow {
 
 	//6.11.1 Equality
 	alias da_scm_eq_p = SCM function(SCM x, SCM y);
-	alias da_scm_is_eq = int function(SCM x, SCM y);
 	alias da_scm_eqv_p = SCM function(SCM x, SCM y);
 	alias da_scm_equal_p = SCM function(SCM x, SCM y);
 
@@ -1742,10 +1701,7 @@ __gshared {
 	//6.6.1 Booleans
 	da_scm_not scm_not;
 	da_scm_boolean_p scm_boolean_p;
-	da_scm_is_true scm_is_true;
-	da_scm_is_false scm_is_false;
 	da_scm_is_bool scm_is_bool;
-	da_scm_from_bool scm_from_bool;
 	da_scm_to_bool scm_to_bool;
 
 	//6.6.2.1 Scheme’s Numerical “Tower”
@@ -1763,20 +1719,6 @@ __gshared {
 	da_scm_to_unsigned_integer scm_to_unsigned_integer;
 	da_scm_from_signed_integer scm_from_signed_integer;
 	da_scm_from_unsigned_integer scm_from_unsigned_integer;
-	da_scm_to_char scm_to_char;
-	da_scm_to_schar scm_to_schar;
-	da_scm_to_uchar scm_to_uchar;
-	da_scm_to_short scm_to_short;
-	da_scm_to_ushort scm_to_ushort;
-	da_scm_to_int scm_to_int;
-	da_scm_to_uint scm_to_uint;
-	da_scm_to_long scm_to_long;
-	da_scm_to_ulong scm_to_ulong;
-	da_scm_to_long_long scm_to_long_long;
-	da_scm_to_ulong_long scm_to_ulong_long;
-	da_scm_to_size_t scm_to_size_t;
-	da_scm_to_ssize_t scm_to_ssize_t;
-	da_scm_to_ptrdiff_t scm_to_ptrdiff_t;
 	da_scm_to_int8 scm_to_int8;
 	da_scm_to_uint8 scm_to_uint8;
 	da_scm_to_int16 scm_to_int16;
@@ -1785,22 +1727,6 @@ __gshared {
 	da_scm_to_uint32 scm_to_uint32;
 	da_scm_to_int64 scm_to_int64;
 	da_scm_to_uint64 scm_to_uint64;
-	da_scm_to_intmax scm_to_intmax;
-	da_scm_to_uintmax scm_to_uintmax;
-	da_scm_from_char scm_from_char;
-	da_scm_from_schar scm_from_schar;
-	da_scm_from_uchar scm_from_uchar;
-	da_scm_from_short scm_from_short;
-	da_scm_from_ushort scm_from_ushort;
-	da_scm_from_int scm_from_int;
-	da_scm_from_uint scm_from_uint;
-	da_scm_from_long scm_from_long;
-	da_scm_from_ulong scm_from_ulong;
-	da_scm_from_long_long scm_from_long_long;
-	da_scm_from_ulong_long scm_from_ulong_long;
-	da_scm_from_size_t scm_from_size_t;
-	da_scm_from_ssize_t scm_from_ssize_t;
-	da_scm_from_ptrdiff_t scm_from_ptrdiff_t;
 	da_scm_from_int8 scm_from_int8;
 	da_scm_from_uint8 scm_from_uint8;
 	da_scm_from_int16 scm_from_int16;
@@ -1809,8 +1735,6 @@ __gshared {
 	da_scm_from_uint32 scm_from_uint32;
 	da_scm_from_int64 scm_from_int64;
 	da_scm_from_uint64 scm_from_uint64;
-	da_scm_from_intmax scm_from_intmax;
-	da_scm_from_uintmax scm_from_uintmax;
 
 	/* excluded for now 
 	da_scm_to_mpz scm_to_mpz;
@@ -1920,7 +1844,7 @@ __gshared {
 	//6.6.2.13 Bitwise Operations
 	da_scm_logand scm_logand;
 	da_scm_logior scm_logior;
-	da_scm_loxor scm_loxor;
+	da_scm_logxor scm_logxor;
 	da_scm_lognot scm_lognot;
 	da_scm_logtest scm_logtest;
 	da_scm_logbit_p scm_logbit_p;
@@ -2253,7 +2177,6 @@ __gshared {
 
 	//6.6.7.4 Operations Related to Symbols
 	da_scm_symbol_p scm_symbol_p;
-	da_scm_is_symbol scm_is_symbol;
 	da_scm_symbol_to_string scm_symbol_to_string;
 	da_scm_string_to_symbol scm_string_to_symbol;
 	da_scm_string_ci_to_symbol scm_string_ci_to_symbol;
@@ -2327,7 +2250,6 @@ __gshared {
 	//6.7.2.2 List Predicates
 	da_scm_list_p scm_list_p;
 	da_scm_null_p scm_null_p;
-	da_scm_is_null scm_is_null;
 
 	//6.7.2.3 List Constructors
 	da_scm_list_1 scm_list_1;
@@ -2457,8 +2379,6 @@ __gshared {
 	//6.7.5.4 Accessing Arrays from C
 	da_scm_array_get_handle scm_array_get_handle;
 	da_scm_array_handle_release scm_array_handle_release;
-	da_scm_array_handle_rank scm_array_handle_rank;
-	da_scm_array_handle_dims scm_array_handle_dims;
 	da_scm_array_handle_pos scm_array_handle_pos;
 	da_scm_array_handle_ref scm_array_handle_ref;
 	da_scm_array_handle_set scm_array_handle_set;
@@ -2581,7 +2501,6 @@ __gshared {
 	da_scm_program_objcode scm_program_objcode;
 	da_scm_program_objects scm_program_objects;
 	da_scm_program_module scm_program_module;
-	da_scm_program_free_variables scm_program_free_variables;
 	da_scm_program_meta scm_program_meta;
 	da_scm_program_arities scm_program_arities;
 
@@ -2610,7 +2529,6 @@ __gshared {
 
 	//6.11.1 Equality
 	da_scm_eq_p scm_eq_p;
-	da_scm_is_eq scm_is_eq;
 	da_scm_eqv_p scm_eqv_p;
 	da_scm_equal_p scm_equal_p;
 
@@ -3452,10 +3370,7 @@ class DerelictGuileLoader : SharedLibLoader {
 		//6.6.1 Booleans
 		bindFunc(cast(void**)&scm_not, "scm_not");
 		bindFunc(cast(void**)&scm_boolean_p, "scm_boolean_p");
-		bindFunc(cast(void**)&scm_is_true, "scm_is_true");
-		bindFunc(cast(void**)&scm_is_false, "scm_is_false");
 		bindFunc(cast(void**)&scm_is_bool, "scm_is_bool");
-		bindFunc(cast(void**)&scm_from_bool, "scm_from_bool");
 		bindFunc(cast(void**)&scm_to_bool, "scm_to_bool");
 
 		//6.6.2.1 Scheme’s Numerical “Tower”
@@ -3473,20 +3388,6 @@ class DerelictGuileLoader : SharedLibLoader {
 		bindFunc(cast(void**)&scm_to_unsigned_integer, "scm_to_unsigned_integer");
 		bindFunc(cast(void**)&scm_from_signed_integer, "scm_from_signed_integer");
 		bindFunc(cast(void**)&scm_from_unsigned_integer, "scm_from_unsigned_integer");
-		bindFunc(cast(void**)&scm_to_char, "scm_to_char");
-		bindFunc(cast(void**)&scm_to_schar, "scm_to_schar");
-		bindFunc(cast(void**)&scm_to_uchar, "scm_to_uchar");
-		bindFunc(cast(void**)&scm_to_short, "scm_to_short");
-		bindFunc(cast(void**)&scm_to_ushort, "scm_to_ushort");
-		bindFunc(cast(void**)&scm_to_int, "scm_to_int");
-		bindFunc(cast(void**)&scm_to_uint, "scm_to_uint");
-		bindFunc(cast(void**)&scm_to_long, "scm_to_long");
-		bindFunc(cast(void**)&scm_to_ulong, "scm_to_ulong");
-		bindFunc(cast(void**)&scm_to_long_long, "scm_to_long_long");
-		bindFunc(cast(void**)&scm_to_ulong_long, "scm_to_ulong_long");
-		bindFunc(cast(void**)&scm_to_size_t, "scm_to_size_t");
-		bindFunc(cast(void**)&scm_to_ssize_t, "scm_to_ssize_t");
-		bindFunc(cast(void**)&scm_to_ptrdiff_t, "scm_to_ptrdiff_t");
 		bindFunc(cast(void**)&scm_to_int8, "scm_to_int8");
 		bindFunc(cast(void**)&scm_to_uint8, "scm_to_uint8");
 		bindFunc(cast(void**)&scm_to_int16, "scm_to_int16");
@@ -3495,22 +3396,6 @@ class DerelictGuileLoader : SharedLibLoader {
 		bindFunc(cast(void**)&scm_to_uint32, "scm_to_uint32");
 		bindFunc(cast(void**)&scm_to_int64, "scm_to_int64");
 		bindFunc(cast(void**)&scm_to_uint64, "scm_to_uint64");
-		bindFunc(cast(void**)&scm_to_intmax, "scm_to_intmax");
-		bindFunc(cast(void**)&scm_to_uintmax, "scm_to_uintmax");
-		bindFunc(cast(void**)&scm_from_char, "scm_from_char");
-		bindFunc(cast(void**)&scm_from_schar, "scm_from_schar");
-		bindFunc(cast(void**)&scm_from_uchar, "scm_from_uchar");
-		bindFunc(cast(void**)&scm_from_short, "scm_from_short");
-		bindFunc(cast(void**)&scm_from_ushort, "scm_from_ushort");
-		bindFunc(cast(void**)&scm_from_int, "scm_from_int");
-		bindFunc(cast(void**)&scm_from_uint, "scm_from_uint");
-		bindFunc(cast(void**)&scm_from_long, "scm_from_long");
-		bindFunc(cast(void**)&scm_from_ulong, "scm_from_ulong");
-		bindFunc(cast(void**)&scm_from_long_long, "scm_from_long_long");
-		bindFunc(cast(void**)&scm_from_ulong_long, "scm_from_ulong_long");
-		bindFunc(cast(void**)&scm_from_size_t, "scm_from_size_t");
-		bindFunc(cast(void**)&scm_from_ssize_t, "scm_from_ssize_t");
-		bindFunc(cast(void**)&scm_from_ptrdiff_t, "scm_from_ptrdiff_t");
 		bindFunc(cast(void**)&scm_from_int8, "scm_from_int8");
 		bindFunc(cast(void**)&scm_from_uint8, "scm_from_uint8");
 		bindFunc(cast(void**)&scm_from_int16, "scm_from_int16");
@@ -3519,8 +3404,6 @@ class DerelictGuileLoader : SharedLibLoader {
 		bindFunc(cast(void**)&scm_from_uint32, "scm_from_uint32");
 		bindFunc(cast(void**)&scm_from_int64, "scm_from_int64");
 		bindFunc(cast(void**)&scm_from_uint64, "scm_from_uint64");
-		bindFunc(cast(void**)&scm_from_intmax, "scm_from_intmax");
-		bindFunc(cast(void**)&scm_from_uintmax, "scm_from_uintmax");
 
 		/* excluded for now
 		bindFunc(cast(void**)&scm_to_mpz, "scm_to_mpz");
@@ -3630,7 +3513,7 @@ class DerelictGuileLoader : SharedLibLoader {
 		//6.6.2.13 Bitwise Operations
 		bindFunc(cast(void**)&scm_logand, "scm_logand");
 		bindFunc(cast(void**)&scm_logior, "scm_logior");
-		bindFunc(cast(void**)&scm_loxor, "scm_loxor");
+		bindFunc(cast(void**)&scm_logxor, "scm_logxor");
 		bindFunc(cast(void**)&scm_lognot, "scm_lognot");
 		bindFunc(cast(void**)&scm_logtest, "scm_logtest");
 		bindFunc(cast(void**)&scm_logbit_p, "scm_logbit_p");
@@ -3964,7 +3847,6 @@ class DerelictGuileLoader : SharedLibLoader {
 
 		//6.6.7.4 Operations Related to Symbols
 		bindFunc(cast(void**)&scm_symbol_p, "scm_symbol_p");
-		bindFunc(cast(void**)&scm_is_symbol, "scm_is_symbol");
 		bindFunc(cast(void**)&scm_symbol_to_string, "scm_symbol_to_string");
 		bindFunc(cast(void**)&scm_string_to_symbol, "scm_string_to_symbol");
 		bindFunc(cast(void**)&scm_string_ci_to_symbol, "scm_string_ci_to_symbol");
@@ -4038,7 +3920,6 @@ class DerelictGuileLoader : SharedLibLoader {
 		//6.7.2.2 List Predicates
 		bindFunc(cast(void**)&scm_list_p, "scm_list_p");
 		bindFunc(cast(void**)&scm_null_p, "scm_null_p");
-		bindFunc(cast(void**)&scm_is_null, "scm_is_null");
 
 		//6.7.2.3 List Constructors
 		bindFunc(cast(void**)&scm_list_1, "scm_list_1");
@@ -4168,8 +4049,6 @@ class DerelictGuileLoader : SharedLibLoader {
 		//6.7.5.4 Accessing Arrays from C
 		bindFunc(cast(void**)&scm_array_get_handle, "scm_array_get_handle");
 		bindFunc(cast(void**)&scm_array_handle_release, "scm_array_handle_release");
-		bindFunc(cast(void**)&scm_array_handle_rank, "scm_array_handle_rank");
-		bindFunc(cast(void**)&scm_array_handle_dims, "scm_array_handle_dims");
 		bindFunc(cast(void**)&scm_array_handle_pos, "scm_array_handle_pos");
 		bindFunc(cast(void**)&scm_array_handle_ref, "scm_array_handle_ref");
 		bindFunc(cast(void**)&scm_array_handle_set, "scm_array_handle_set");
@@ -4292,7 +4171,6 @@ class DerelictGuileLoader : SharedLibLoader {
 		bindFunc(cast(void**)&scm_program_objcode, "scm_program_objcode");
 		bindFunc(cast(void**)&scm_program_objects, "scm_program_objects");
 		bindFunc(cast(void**)&scm_program_module, "scm_program_module");
-		bindFunc(cast(void**)&scm_program_free_variables, "scm_program_free_variables");
 		bindFunc(cast(void**)&scm_program_meta, "scm_program_meta");
 		bindFunc(cast(void**)&scm_program_arities, "scm_program_arities");
 
@@ -4321,7 +4199,6 @@ class DerelictGuileLoader : SharedLibLoader {
 
 		//6.11.1 Equality
 		bindFunc(cast(void**)&scm_eq_p, "scm_eq_p");
-		bindFunc(cast(void**)&scm_is_eq, "scm_is_eq");
 		bindFunc(cast(void**)&scm_eqv_p, "scm_eqv_p");
 		bindFunc(cast(void**)&scm_equal_p, "scm_equal_p");
 
