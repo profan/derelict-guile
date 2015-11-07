@@ -1,0 +1,9 @@
+{
+	"name": "derelict-guile",
+	"description": "A dynamic ibnding to Guile scheme",
+	"authors": ["profan"],
+	"license": "MIT",
+	"dependencies": {
+		"derelict-util": "~>2.0.3"
+	}
+}
