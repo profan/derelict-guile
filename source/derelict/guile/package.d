@@ -1174,7 +1174,7 @@ extern(C) @nogc nothrow {
 	alias da_scm_gc_unprotect_object = SCM function(SCM obj);
 	alias da_scm_permanent_object = SCM function(SCM obj);
 	alias da_scm_gc_stats = SCM function();
-	alias da_sm_gc_live_object_stats = SCM function();
+	alias da_scm_gc_live_object_stats = SCM function();
 
 	//6.18.2 Memory Blocks
 	alias da_scm_malloc = void * function(size_t size);
@@ -1215,7 +1215,7 @@ extern(C) @nogc nothrow {
 	alias da_scm_variable_p = SCM function(SCM obj);
 
 	//6.19.8 Module System Reflection
-	alias da_scm_current_module SCM function();
+	alias da_scm_current_module = SCM function();
 	alias da_scm_set_current_module = SCM function(SCM modle);
 	alias da_scm_resolve_module = SCM function(SCM name);
 
@@ -1970,6 +1970,7 @@ __gshared {
 	da_scm_seed_to_random_state scm_seed_to_random_state;
 	da_scm_datum_to_random_state scm_datum_to_random_state;
 	da_scm_random_state_to_datum scm_random_state_to_datum;
+	da_scm_random_state_from_platform scm_random_state_from_platform;
 
 	//6.6.3 Characters
 	da_scm_char_p scm_char_p;
@@ -3031,6 +3032,8 @@ __gshared {
 	da_scm_run_asyncs scm_run_asyncs;
 
 	//6.21.3 Threads
+	da_scm_all_threads scm_all_threads;
+	da_scm_current_thread scm_current_thread;
 	da_scm_spawn_thread scm_spawn_thread;
 	da_scm_thread_p scm_thread_p;
 	da_scm_join_thread scm_join_thread;
@@ -3102,7 +3105,7 @@ __gshared {
 	da_scm_sys_package_data_dir scm_sys_package_data_dir;
 	da_scm_sys_library_dir scm_sys_library_dir;
 	da_scm_sys_site_dir scm_sys_site_dir;
-	da_scm_sys_site_ccache_dir scm_sys_site_cache_dir;
+	da_scm_sys_site_ccache_dir scm_sys_site_ccache_dir;
 
 	//6.22.2.1 Feature Manipulation
 	da_scm_add_feature scm_add_feature;
@@ -5050,7 +5053,7 @@ class DerelictGuileLoader : SharedLibLoader {
 		//7.2.9 Terminals and Ptys
 		bindFunc(cast(void**)&scm_isatty_p, "scm_isatty_p");
 		bindFunc(cast(void**)&scm_ttyname, "scm_ttyname");
-		bindFunc(cast(void**)&scm_ctermid, "scm_ctermid")
+		bindFunc(cast(void**)&scm_ctermid, "scm_ctermid");
 		bindFunc(cast(void**)&scm_tcgetpgrp, "scm_tcgetpgrp");
 		bindFunc(cast(void**)&scm_tcsetpgrp, "scm_tcsetpgrp");
 
@@ -5099,7 +5102,7 @@ class DerelictGuileLoader : SharedLibLoader {
 
 		//7.2.12 System Identification
 		bindFunc(cast(void**)&scm_uname, "scm_uname");
-		bindFunc(cast(void**)&scm_gethostname, "scm_gethostname")
+		bindFunc(cast(void**)&scm_gethostname, "scm_gethostname");
 		bindFunc(cast(void**)&scm_sethostname, "scm_sethostname");
 
 		//7.2.13 Locales
