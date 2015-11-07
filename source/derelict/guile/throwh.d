@@ -1,6 +1,7 @@
 module derelict.guile.throwh;
 /* corresponds to throw.h in libguile */
 
+import derelict.guile.tags;
 import derelict.guile.types;
 
 alias scm_t_catch_body = extern(C) nothrow @nogc SCM function(void* data);

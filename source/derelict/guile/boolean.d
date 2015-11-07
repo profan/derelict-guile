@@ -1,6 +1,7 @@
 module derelict.guile.boolean;
 /* corresponds to boolean.h in libguile */
 
+import derelict.guile.tags;
 import derelict.guile.types;
 
 /* BECAUSE THEYRE MACROS, NOT FUNCTIONS ;_; */

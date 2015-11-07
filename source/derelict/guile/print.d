@@ -1,6 +1,7 @@
 module derelict.guile.print;
 /* corresponds to print.h in libguile */
 
+import derelict.guile.tags;
 import derelict.guile.types;
 
 struct scm_print_state {

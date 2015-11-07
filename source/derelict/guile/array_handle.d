@@ -1,6 +1,7 @@
 /* corresponds to array-handle.h in libguile */
 module derelict.guile.array_handle;
 
+import derelict.guile.tags;
 import derelict.guile.types;
 
 alias scm_t_array_element_type = int;

@@ -22,6 +22,7 @@ public import derelict.guile.hooks;
 public import derelict.guile.keywords;
 public import derelict.guile.print;
 public import derelict.guile.strings;
+public import derelict.guile.tags;
 public import derelict.guile.throwh;
 
 extern(C) @nogc nothrow {

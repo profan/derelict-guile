@@ -8,7 +8,6 @@ alias scm_t_intptr = int*;
 alias scm_t_uintptr = uint*;
 alias scm_t_bits = scm_t_uintptr;
 alias scm_t_signed_bits = scm_t_intptr;
-alias SCM = scm_t_bits;
 
 alias scm_t_int8 = byte;
 alias scm_t_uint8 = ubyte;
