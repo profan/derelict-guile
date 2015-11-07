@@ -35,263 +35,264 @@ extern(C) @nogc nothrow {
 
 	import core.stdc.config : c_long, c_ulong;
 
+	//6.4 Initializing Guile
 	alias da_scm_with_guile = void* function(void* function(void*), void* data);
 	alias da_scm_init_guile = void function();
 	alias da_scm_boot_guile = void function(int argc, char **argv, void function(void* data, int argc, char **argv), void* data);
 	alias da_scm_shell = void function(int argc, char **argv);
 
 	//6.6.1 Booleans
-	//alias da_scm_not = SCM function(SCM x);
-	//alias da_scm_boolean_p = SCM function(SCM obj);
-	//alias da_scm_is_true = int function(SCM obj);
-	//alias da_scm_is_false = int function(SCM obj);
-	//alias da_scm_is_bool = int function(SCM obj);
-	//alias da_scm_from_bool = SCM function(int val);
-	//alias da_scm_to_bool = int function(SCM val);
+	alias da_scm_not = SCM function(SCM x);
+	alias da_scm_boolean_p = SCM function(SCM obj);
+	alias da_scm_is_true = int function(SCM obj);
+	alias da_scm_is_false = int function(SCM obj);
+	alias da_scm_is_bool = int function(SCM obj);
+	alias da_scm_from_bool = SCM function(int val);
+	alias da_scm_to_bool = int function(SCM val);
 
 	//6.6.2.2 Integers
-	//alias da_scm_number_p = SCM function(SCM obj);
-	//alias da_scm_is_number = int function(SCM obj);
-	//alias da_scm_integer_p = SCM function(SCM x);
-	//alias da_scm_is_integer = int function(SCM x);
-	//alias da_scm_exact_integer_p = SCM function(SCM x);
-	//alias da_scm_is_exact_inteer = int function(SCM x);
-	//alias da_scm_is_signed_integer = int function(SCM x, scm_t_intmax min, scm_t_intmax max);
-	//alias da_scm_is_unsigned_integer = int function(SCM x, scm_t_uintmax min, scm_t_uintmax max);
-	//alias da_scm_to_signed_integer = scm_t_intmax function(SCM x, scm_t_intmax min, scm_t_intmax max);
-	//alias da_scm_to_unsigned_integer = scm_t_uintmax function(SCM x, scm_t_uintmax min, scm_t_uintmax max);
-	//alias da_scm_from_signed_integer = SCM function(scm_t_intmax x);
-	//alias da_scm_from_unsigned_integer = SCM function(scm_t_uintmax x);
-	//alias da_scm_to_char = char function(SCM x);
-	//alias da_scm_to_schar = byte function(SCM x);
-	//alias da_scm_to_uchar = ubyte function(SCM x);
-	//alias da_scm_to_short = short function(SCM x);
-	//alias da_scm_to_ushort = ushort function(SCM x);
-	//alias da_scm_to_int = int function(SCM x);
-	//alias da_scm_to_uint = uint function(SCM x);
-	//alias da_scm_to_long = c_long function(SCM x);
-	//alias da_scm_to_ulong = c_ulong function(SCM y);
-	//alias da_scm_to_long_long = long function(SCM x);
-	//alias da_scm_to_ulong_long = ulong function(SCM x);
-	//alias da_scm_to_size_t = size_t function(SCM x);
-	//alias da_scm_to_ssize_t = ssize_t function(SCM x);
-	//alias da_scm_to_ptrdiff_t = scm_t_ptrdiff function(SCM x);
-	//alias da_scm_to_int8 = scm_t_int8 function(SCM x);
-	//alias da_scm_to_uint8 = scm_t_uint8 function(SCM x);
-	//alias da_scm_to_int16 = scm_t_int16 function(SCM x);
-	//alias da_scm_to_uint16 = scm_t_uint16 function(SCM x);
-	//alias da_scm_to_int32 = scm_t_int32 function(SCM x);
-	//alias da_scm_to_uint32 = scm_t_uint32 function(SCM x);
-	//alias da_scm_to_int64 = scm_t_int64 function(SCM x);
-	//alias da_scm_to_uint64 = scm_t_uint64 function(SCM x);
-	//alias da_scm_to_intmax = scm_t_intmax function(SCM x);
-	//alias da_scm_to_uintmax = scm_t_uintmax function(SCM x);
+	alias da_scm_number_p = SCM function(SCM obj);
+	alias da_scm_is_number = int function(SCM obj);
+	alias da_scm_integer_p = SCM function(SCM x);
+	alias da_scm_is_integer = int function(SCM x);
+	alias da_scm_exact_integer_p = SCM function(SCM x);
+	alias da_scm_is_exact_inteer = int function(SCM x);
+	alias da_scm_is_signed_integer = int function(SCM x, scm_t_intmax min, scm_t_intmax max);
+	alias da_scm_is_unsigned_integer = int function(SCM x, scm_t_uintmax min, scm_t_uintmax max);
+	alias da_scm_to_signed_integer = scm_t_intmax function(SCM x, scm_t_intmax min, scm_t_intmax max);
+	alias da_scm_to_unsigned_integer = scm_t_uintmax function(SCM x, scm_t_uintmax min, scm_t_uintmax max);
+	alias da_scm_from_signed_integer = SCM function(scm_t_intmax x);
+	alias da_scm_from_unsigned_integer = SCM function(scm_t_uintmax x);
+	alias da_scm_to_char = char function(SCM x);
+	alias da_scm_to_schar = byte function(SCM x);
+	alias da_scm_to_uchar = ubyte function(SCM x);
+	alias da_scm_to_short = short function(SCM x);
+	alias da_scm_to_ushort = ushort function(SCM x);
+	alias da_scm_to_int = int function(SCM x);
+	alias da_scm_to_uint = uint function(SCM x);
+	alias da_scm_to_long = c_long function(SCM x);
+	alias da_scm_to_ulong = c_ulong function(SCM y);
+	alias da_scm_to_long_long = long function(SCM x);
+	alias da_scm_to_ulong_long = ulong function(SCM x);
+	alias da_scm_to_size_t = size_t function(SCM x);
+	alias da_scm_to_ssize_t = ssize_t function(SCM x);
+	alias da_scm_to_ptrdiff_t = scm_t_ptrdiff function(SCM x);
+	alias da_scm_to_int8 = scm_t_int8 function(SCM x);
+	alias da_scm_to_uint8 = scm_t_uint8 function(SCM x);
+	alias da_scm_to_int16 = scm_t_int16 function(SCM x);
+	alias da_scm_to_uint16 = scm_t_uint16 function(SCM x);
+	alias da_scm_to_int32 = scm_t_int32 function(SCM x);
+	alias da_scm_to_uint32 = scm_t_uint32 function(SCM x);
+	alias da_scm_to_int64 = scm_t_int64 function(SCM x);
+	alias da_scm_to_uint64 = scm_t_uint64 function(SCM x);
+	alias da_scm_to_intmax = scm_t_intmax function(SCM x);
+	alias da_scm_to_uintmax = scm_t_uintmax function(SCM x);
 
-	//alias da_scm_from_char = SCM function(char x);
-	//alias da_scm_from_schar = SCM function(byte x);
-	//alias da_scm_from_uchar = SCM function(ubyte x);
-	//alias da_scm_from_short = SCM function(short x);
-	//alias da_scm_from_ushort = SCM function(ushort x);
-	//alias da_scm_from_int = SCM function(int x);
-	//alias da_scm_from_uint = SCM function(uint x);
-	//alias da_scm_from_long = SCM function(long x);
-	//alias da_scm_from_ulong = SCM function(ulong x);
-	//alias da_scm_from_long_long = SCM function(long x);
-	//alias da_scm_from_ulong_long = SCM function(ulong x);
-	//alias da_scm_from_size_t = SCM function(size_t x);
-	//alias da_scm_from_ssize_t = SCM function(scm_t_ssize_t x);
-	//alias da_scm_from_ptrdiff_t = SCM function(ptrdiff_t x);
-	//alias da_scm_from_int8 = SCM function(scm_t_int8 x);
-	//alias da_scm_from_uint8 = SCM function(scm_t_uint8 x);
-	//alias da_scm_from_int16 = SCM function(scm_t_int16 x);
-	//alias da_scm_from_uint16 = SCM function(scm_t_uint16 x);
-	//alias da_scm_from_int32 = SCM function(scm_t_int32 x);
-	//alias da_scm_from_uint32 = SCM function(scm_t_uint32 x);
-	//alias da_scm_from_int64 = SCM function(scm_t_int64 x);
-	//alias da_scm_from_uint64 = SCM function(scm_t_uint64 x);
-	//alias da_scm_from_intmax = SCM function(scm_t_intmax x);
-	//alias da_scm_from_uintmax = SCM function(scm_t_uintmax x);
+	alias da_scm_from_char = SCM function(char x);
+	alias da_scm_from_schar = SCM function(byte x);
+	alias da_scm_from_uchar = SCM function(ubyte x);
+	alias da_scm_from_short = SCM function(short x);
+	alias da_scm_from_ushort = SCM function(ushort x);
+	alias da_scm_from_int = SCM function(int x);
+	alias da_scm_from_uint = SCM function(uint x);
+	alias da_scm_from_long = SCM function(long x);
+	alias da_scm_from_ulong = SCM function(ulong x);
+	alias da_scm_from_long_long = SCM function(long x);
+	alias da_scm_from_ulong_long = SCM function(ulong x);
+	alias da_scm_from_size_t = SCM function(size_t x);
+	alias da_scm_from_ssize_t = SCM function(scm_t_ssize_t x);
+	alias da_scm_from_ptrdiff_t = SCM function(ptrdiff_t x);
+	alias da_scm_from_int8 = SCM function(scm_t_int8 x);
+	alias da_scm_from_uint8 = SCM function(scm_t_uint8 x);
+	alias da_scm_from_int16 = SCM function(scm_t_int16 x);
+	alias da_scm_from_uint16 = SCM function(scm_t_uint16 x);
+	alias da_scm_from_int32 = SCM function(scm_t_int32 x);
+	alias da_scm_from_uint32 = SCM function(scm_t_uint32 x);
+	alias da_scm_from_int64 = SCM function(scm_t_int64 x);
+	alias da_scm_from_uint64 = SCM function(scm_t_uint64 x);
+	alias da_scm_from_intmax = SCM function(scm_t_intmax x);
+	alias da_scm_from_uintmax = SCM function(scm_t_uintmax x);
 
-	//alias da_scm_to_mpz = void function(SCM val, mpz_t rop);
-	//alias da_scm_from_mpz = SCM function(mpz_t val);
+	alias da_scm_to_mpz = void function(SCM val, mpz_t rop);
+	alias da_scm_from_mpz = SCM function(mpz_t val);
 
 	//6.6.2.3 Real and Rational Numbers
-	//alias da_scm_real_p = SCM function(SCM obj);
-	//alias da_scm_rational_p = SCM function(SCM x);
-	//alias da_scm_rationalize = SCM function(SCM x, SCM eps);
-	//alias da_scm_inf_p = SCM function(SCM x);
-	//alias da_scm_nan_p = SCM function(SCM x);
-	//alias da_scm_finite_p = SCM function(SCM x);
-	//alias da_scm_nan = SCM function();
-	//alias da_scm_inf = SCM function();
-	//alias da_scm_numerator = SCM function(SCM x);
-	//alias da_scm_denominator = SCM function(SCM x);
-	//alias da_scm_is_real = int function(SCM val);
-	//alias da_scm_is_rational = int function(SCM val);
-	//alias da_scm_to_double = double function(SCM val);
-	//alias da_scm_from_double = SCM function(double val);
+	alias da_scm_real_p = SCM function(SCM obj);
+	alias da_scm_rational_p = SCM function(SCM x);
+	alias da_scm_rationalize = SCM function(SCM x, SCM eps);
+	alias da_scm_inf_p = SCM function(SCM x);
+	alias da_scm_nan_p = SCM function(SCM x);
+	alias da_scm_finite_p = SCM function(SCM x);
+	alias da_scm_nan = SCM function();
+	alias da_scm_inf = SCM function();
+	alias da_scm_numerator = SCM function(SCM x);
+	alias da_scm_denominator = SCM function(SCM x);
+	alias da_scm_is_real = int function(SCM val);
+	alias da_scm_is_rational = int function(SCM val);
+	alias da_scm_to_double = double function(SCM val);
+	alias da_scm_from_double = SCM function(double val);
 
 	//6.6.2.4 Complex Numbers
-	//alias da_scm_complex_p = SCM function(SCM z);
-	//alias da_scm_is_complex = int function(SCM val);
+	alias da_scm_complex_p = SCM function(SCM z);
+	alias da_scm_is_complex = int function(SCM val);
 
 	//6.6.2.5 Exact and Inexact Numbers
-	//alias da_scm_exact_p = SCM function(SCM z);
-	//alias da_scm_is_exact = int function(SCM z);
-	//alias da_scm_is_inexact_p = SCM function(SCM z);
-	//alias da_scm_is_inexact = int function(SCM z);
-	//alias da_scm_inexact_to_exact = SCM function(SCM z);
-	//alias da_scm_exact_to_inexact = SCM function(SCM z);
+	alias da_scm_exact_p = SCM function(SCM z);
+	alias da_scm_is_exact = int function(SCM z);
+	alias da_scm_is_inexact_p = SCM function(SCM z);
+	alias da_scm_is_inexact = int function(SCM z);
+	alias da_scm_inexact_to_exact = SCM function(SCM z);
+	alias da_scm_exact_to_inexact = SCM function(SCM z);
 
 	//6.6.2.7 Operations on Integer Values
-	//alias da_scm_odd_p = SCM function(SCM n);
-	//alias da_scm_even_p = SCM function(SCM n);
-	//alias da_scm_quotient = SCM function(SCM n, SCM d);
-	//alias da_scm_remainder = SCM function(SCM n, SCM d);
-	//alias da_scm_modulo = SCM function(SCM n, SCM d);
-	//alias da_scm_gcd = SCM function(SCM x, SCM y);
-	//alias da_scm_lcm = SCM function(SCM x, SCM y);
-	//alias da_scm_modulo_expt = SCM function(SCM n, SCM k, SCM m);
-	//alias da_scm_exact_integer_sqrt = void function(SCM k, SCM *s, SCM *r);
+	alias da_scm_odd_p = SCM function(SCM n);
+	alias da_scm_even_p = SCM function(SCM n);
+	alias da_scm_quotient = SCM function(SCM n, SCM d);
+	alias da_scm_remainder = SCM function(SCM n, SCM d);
+	alias da_scm_modulo = SCM function(SCM n, SCM d);
+	alias da_scm_gcd = SCM function(SCM x, SCM y);
+	alias da_scm_lcm = SCM function(SCM x, SCM y);
+	alias da_scm_modulo_expt = SCM function(SCM n, SCM k, SCM m);
+	alias da_scm_exact_integer_sqrt = void function(SCM k, SCM *s, SCM *r);
 
 	//6.6.2.8 Comparison Predicates
-	//alias da_scm_num_eq_p = SCM function(SCM x, SCM y);
-	//alias da_scm_less_p = SCM function(SCM x, SCM y);
-	//alias da_scm_gr_p = SCM function(SCM x, SCM y);
-	//alias da_scm_leq_p = SCM function(SCM x, SCM y);
-	//alias da_scm_geq_p = SCM function(SCM x, SCM y);
-	//alias da_scm_zero_p = SCM function(SCM z);
-	//alias da_scm_positive_p = SCM function(SCM x);
-	//alias da_scm_negative_p = SCM function(SCM x);
+	alias da_scm_num_eq_p = SCM function(SCM x, SCM y);
+	alias da_scm_less_p = SCM function(SCM x, SCM y);
+	alias da_scm_gr_p = SCM function(SCM x, SCM y);
+	alias da_scm_leq_p = SCM function(SCM x, SCM y);
+	alias da_scm_geq_p = SCM function(SCM x, SCM y);
+	alias da_scm_zero_p = SCM function(SCM z);
+	alias da_scm_positive_p = SCM function(SCM x);
+	alias da_scm_negative_p = SCM function(SCM x);
 
 	//6.6.2.9 Converting Numbers To and From Strings
-	//alias da_scm_number_to_string = SCM function(SCM n, SCM radix);
-	//alias da_scm_string_to_number = SCM function(SCM string, SCM radix);
-	//alias da_scm_c_locale_stringn_to_number = SCM function(const char* string, size_t len, uint radix);
+	alias da_scm_number_to_string = SCM function(SCM n, SCM radix);
+	alias da_scm_string_to_number = SCM function(SCM string, SCM radix);
+	alias da_scm_c_locale_stringn_to_number = SCM function(const char* string, size_t len, uint radix);
 
 	//6.6.2.10 Complex Number Operations
-	//alias da_scm_make_rectangular = SCM function(SCM mag, SCM ang);
-	//alias da_scm_make_polar = SCM function(SCM mag, SCM ang);
-	//alias da_scm_real_part = SCM function(SCM z);
-	//alias da_scm_imag_part = SCM function(SCM z);
-	//alias da_scm_magnitude = SCM function(SCM z);
-	//alias da_scm_angle = SCM function(SCM z);
-	//alias da_scm_c_make_rectangular = SCM function(double re, double im);
-	//alias da_scm_c_make_polar = SCM function(double x, double y);
-	//alias da_scm_c_real_part = double function(SCM z);
-	//alias da_scm_c_imag_part = double function(SCM z);
-	//alias da_scm_c_magnitude = double function(SCM z);
-	//alias da_scm_c_angle = double function(SCM z);
+	alias da_scm_make_rectangular = SCM function(SCM mag, SCM ang);
+	alias da_scm_make_polar = SCM function(SCM mag, SCM ang);
+	alias da_scm_real_part = SCM function(SCM z);
+	alias da_scm_imag_part = SCM function(SCM z);
+	alias da_scm_magnitude = SCM function(SCM z);
+	alias da_scm_angle = SCM function(SCM z);
+	alias da_scm_c_make_rectangular = SCM function(double re, double im);
+	alias da_scm_c_make_polar = SCM function(double x, double y);
+	alias da_scm_c_real_part = double function(SCM z);
+	alias da_scm_c_imag_part = double function(SCM z);
+	alias da_scm_c_magnitude = double function(SCM z);
+	alias da_scm_c_angle = double function(SCM z);
 
 	//6.6.2.11 Arithmetic Functions
-	//alias da_scm_sum = SCM function(SCM z1, SCM z2);
-	//alias da_scm_difference = SCM function(SCM z1, SCM z2);
-	//alias da_scm_product = SCM function(SCM z1, SCM z2);
-	//alias da_scm_divide = SCM function(SCM z1, SCM z2);
-	//alias da_scm_oneplus = SCM function(SCM z);
-	//alias da_scm_oneminus = SCM function(SCM z);
-	//alias da_scm_abs = SCM function(SCM x);
-	//alias da_scm_max = SCM function(SCM x1, SCM x2);
-	//alias da_scm_min = SCM function(SCM x1, SCM x2);
-	//alias da_scm_truncate_number = SCM function(SCM x);
-	//alias da_scm_round_number = SCM function(SCM x);
-	//alias da_scm_floor = SCM function(SCM x);
-	//alias da_scm_ceiling = SCM function(SCM x);
+	alias da_scm_sum = SCM function(SCM z1, SCM z2);
+	alias da_scm_difference = SCM function(SCM z1, SCM z2);
+	alias da_scm_product = SCM function(SCM z1, SCM z2);
+	alias da_scm_divide = SCM function(SCM z1, SCM z2);
+	alias da_scm_oneplus = SCM function(SCM z);
+	alias da_scm_oneminus = SCM function(SCM z);
+	alias da_scm_abs = SCM function(SCM x);
+	alias da_scm_max = SCM function(SCM x1, SCM x2);
+	alias da_scm_min = SCM function(SCM x1, SCM x2);
+	alias da_scm_truncate_number = SCM function(SCM x);
+	alias da_scm_round_number = SCM function(SCM x);
+	alias da_scm_floor = SCM function(SCM x);
+	alias da_scm_ceiling = SCM function(SCM x);
 	alias da_scm_c_truncate = double function(double x);
 	alias da_scm_c_round = double function(double x);
-	//alias da_scm_euclidean_divide = void function(SCM x, SCM y, SCM *q, SCM *r);
-	//alias da_scm_eucidean_quotient = SCM function(SCM x, SCM y);
-	//alias da_scm_euclidean_reaminder = SCM function(SCM x, SCM y);
-	//alias da_scm_floor_divide = void function(SCM x, SCM y, SCM *q, SCM *r);
-	//alias da_scm_floor_quotient = SCM function(SCM x, SCM y);
-	//alias da_scm_floor_remainder = SCM function(SCM x, SCM y);
-	//alias da_scm_ceiling_divide = void function(SCM x, SCM y, SCM *q, SCM *r);
-	//alias da_scm_ceiling_quotient = SCM function(SCM x, SCM y);
-	//alias da_scm_ceiling_remainder = SCM function(SCM x, SCM y);
-	//alias da_scm_truncate_divide = void function(SCM x, SCM y, SCM *q, SCM *r);
-	//alias da_scm_truncate_quotient = SCM function(SCM x, SCM y);
-	//alias da_scm_trucnate_remainder = SCM function(SCM x, SCM y);
-	//alias da_scm_centered_divide = void function(SCM x, SCM y, SCM *q, SCM *r);
-	//alias da_scm_centered_remainder = void function(SCM x, SCM y);
-	//alias da_scm_round_divide = void function(SCM x, SCM y, SCM *q, SCM *r);
-	//alias da_scm_round_quotient = SCM function(SCM x, SCM y);
-	//alias da_scm_round_remainder = SCM function(SCM x, SCM y);
+	alias da_scm_euclidean_divide = void function(SCM x, SCM y, SCM *q, SCM *r);
+	alias da_scm_eucidean_quotient = SCM function(SCM x, SCM y);
+	alias da_scm_euclidean_reaminder = SCM function(SCM x, SCM y);
+	alias da_scm_floor_divide = void function(SCM x, SCM y, SCM *q, SCM *r);
+	alias da_scm_floor_quotient = SCM function(SCM x, SCM y);
+	alias da_scm_floor_remainder = SCM function(SCM x, SCM y);
+	alias da_scm_ceiling_divide = void function(SCM x, SCM y, SCM *q, SCM *r);
+	alias da_scm_ceiling_quotient = SCM function(SCM x, SCM y);
+	alias da_scm_ceiling_remainder = SCM function(SCM x, SCM y);
+	alias da_scm_truncate_divide = void function(SCM x, SCM y, SCM *q, SCM *r);
+	alias da_scm_truncate_quotient = SCM function(SCM x, SCM y);
+	alias da_scm_trucnate_remainder = SCM function(SCM x, SCM y);
+	alias da_scm_centered_divide = void function(SCM x, SCM y, SCM *q, SCM *r);
+	alias da_scm_centered_remainder = void function(SCM x, SCM y);
+	alias da_scm_round_divide = void function(SCM x, SCM y, SCM *q, SCM *r);
+	alias da_scm_round_quotient = SCM function(SCM x, SCM y);
+	alias da_scm_round_remainder = SCM function(SCM x, SCM y);
 
 	//6.6.2.12 Bitwise Operations
-	//alias da_scm_logand = SCM function(SCM n1, SCM n2);
-	//alias da_scm_logior = SCM function(SCM n1, SCM n2);
-	//alias da_scm_logxor = SCM function(SCM n1, SCM n2);
-	//alias da_scm_lognot = SCM function(SCM n);
-	//alias da_scm_logtest = SCM function(SCM j, SCM k);
-	//alias da_scm_logbit_p = SCM function(SCM index, SCM j);
-	//alias da_scm_ash = SCM function(SCM n, SCM count);
-	//alias da_scm_round_ash = SCM function(SCM n, SCM count);
-	//alias da_scm_logcount = SCM function(SCM n);
-	//alias da_scm_integer_length = SCM function(SCM n);
-	//alias da_scm_integer_expt = SCM function(SCM n, SCM k);
-	//alias da_scm_bit_extract = SCM function(SCM n, SCM start, SCM end);
+	alias da_scm_logand = SCM function(SCM n1, SCM n2);
+	alias da_scm_logior = SCM function(SCM n1, SCM n2);
+	alias da_scm_logxor = SCM function(SCM n1, SCM n2);
+	alias da_scm_lognot = SCM function(SCM n);
+	alias da_scm_logtest = SCM function(SCM j, SCM k);
+	alias da_scm_logbit_p = SCM function(SCM index, SCM j);
+	alias da_scm_ash = SCM function(SCM n, SCM count);
+	alias da_scm_round_ash = SCM function(SCM n, SCM count);
+	alias da_scm_logcount = SCM function(SCM n);
+	alias da_scm_integer_length = SCM function(SCM n);
+	alias da_scm_integer_expt = SCM function(SCM n, SCM k);
+	alias da_scm_bit_extract = SCM function(SCM n, SCM start, SCM end);
 
 	//6.6.2.14 Random Number Generation
-	//alias da_scm_copy_random_state = SCM function(SCM state);
-	//alias da_scm_random = SCM function(SCM n, SCM state);
-	//alias da_scm_random_exp = SCM function(SCM state);
-	//alias da_scm_random_hollow_sphere_x = SCM function(SCM vect, SCM state);
-	//alias da_scm_random_normal = SCM function(SCM state);
-	//alias da_scm_random_normal_vector_x = SCM function(SCM vect, SCM state);
-	//alias da_scm_random_solid_sphere_x = SCM function(SCM vect, SCM state);
-	//alias da_scm_random_uniform = SCM function(SCM state);
-	//alias da_scm_seed_to_random_state = SCM function(SCM seed);
-	//alias da_scm_datum_to_random_state = SCM function(SCM datum);
-	//alias da_scm_random_state_to_datum = SCM function(SCM state);
-	//alias da_scm_random_state_from_platform = SCM function();
+	alias da_scm_copy_random_state = SCM function(SCM state);
+	alias da_scm_random = SCM function(SCM n, SCM state);
+	alias da_scm_random_exp = SCM function(SCM state);
+	alias da_scm_random_hollow_sphere_x = SCM function(SCM vect, SCM state);
+	alias da_scm_random_normal = SCM function(SCM state);
+	alias da_scm_random_normal_vector_x = SCM function(SCM vect, SCM state);
+	alias da_scm_random_solid_sphere_x = SCM function(SCM vect, SCM state);
+	alias da_scm_random_uniform = SCM function(SCM state);
+	alias da_scm_seed_to_random_state = SCM function(SCM seed);
+	alias da_scm_datum_to_random_state = SCM function(SCM datum);
+	alias da_scm_random_state_to_datum = SCM function(SCM state);
+	alias da_scm_random_state_from_platform = SCM function();
 
 	//6.6.3 Characters
-	//alias da_scm_char_p = SCM function(SCM x);
-	//alias da_scm_char_alphabetic_p = SCM function(SCM chr);
-	//alias da_scm_char_numeric_p = SCM function(SCM chr);
-	//alias da_scm_char_whitespace_p = SCM function(SCM chr);
-	//alias da_scm_char_upper_case_p = SCM function(SCM chr);
-	//alias da_scm_char_lower_case_p = SCM function(SCM chr);
-	//alias da_scm_char_is_both_p = SCM function(SCM chr);
-	//alias da_scm_char_general_category = SCM function(SCM chr);
-	//alias da_scm_char_to_integer = SCM function(SCM chr);
-	//alias da_scm_integer_to_char = SCM function(SCM n);
-	//alias da_scm_char_upcase = SCM function(SCM chr);
-	//alias da_scm_char_downcaes = SCM function(SCM chr);
-	//alias da_scm_char_titlecase = SCM function(SCM chr);
-	//alias da_scm_c_upcase = scm_t_wchar function(scm_t_wchar c);
-	//alias da_scm_c_downcase = scm_t_wchar function(scm_t_wchar c);
-	//alias da_scm_c_titlecase = scm_t_wchar function(scm_t_wchar c);
+	alias da_scm_char_p = SCM function(SCM x);
+	alias da_scm_char_alphabetic_p = SCM function(SCM chr);
+	alias da_scm_char_numeric_p = SCM function(SCM chr);
+	alias da_scm_char_whitespace_p = SCM function(SCM chr);
+	alias da_scm_char_upper_case_p = SCM function(SCM chr);
+	alias da_scm_char_lower_case_p = SCM function(SCM chr);
+	alias da_scm_char_is_both_p = SCM function(SCM chr);
+	alias da_scm_char_general_category = SCM function(SCM chr);
+	alias da_scm_char_to_integer = SCM function(SCM chr);
+	alias da_scm_integer_to_char = SCM function(SCM n);
+	alias da_scm_char_upcase = SCM function(SCM chr);
+	alias da_scm_char_downcaes = SCM function(SCM chr);
+	alias da_scm_char_titlecase = SCM function(SCM chr);
+	alias da_scm_c_upcase = scm_t_wchar function(scm_t_wchar c);
+	alias da_scm_c_downcase = scm_t_wchar function(scm_t_wchar c);
+	alias da_scm_c_titlecase = scm_t_wchar function(scm_t_wchar c);
 
 	//6.6.4.1 Character Set Predicates/Comparison
-	//alias da_scm_set_p = SCM function(SCM obj);
-	//alias da_scm_char_set_eq = SCM function(SCM char_sets);
-	//alias da_scm_char_set_leq = SCM function(SCM char_sets);
-	//alias da_scm_char_set_hash = SCM function(SCM cs, SCM bound);
+	alias da_scm_set_p = SCM function(SCM obj);
+	alias da_scm_char_set_eq = SCM function(SCM char_sets);
+	alias da_scm_char_set_leq = SCM function(SCM char_sets);
+	alias da_scm_char_set_hash = SCM function(SCM cs, SCM bound);
 
 	//6.6.4.2 Iterating over Character Sets
-	//alias da_scm_char_set_cursor = SCM function(SCM cs);
-	//alias da_scm_char_set_ref = SCM function(SCM cs, SCM cursor);
-	//alias da_scm_char_set_cursor_next = SCM function(SCM cs, SCM cursor);
-	//alias da_scm_end_of_char_set_p = SCM function(SCM cursor);
-	//alias da_scm_char_set_fold = SCM function(SCM kons, SCN knil, SCM cs);
-	//alias da_scm_char_set_unfold = SCM function(SCN p, SCM f, SCM g, SCM seed, SCM base, SCM base_cs);
-	//alias da_scm_char_set_unfold_x = SCM function(SCM p, SCM f, SCM g, SCM seed, SCM base, SCM base_cs);
-	//alias da_scm_char_set_for_each = SCM function(SCM proc, SCM cs);
-	//alias da_scm_char_set_map = SCM function(SCM proc, SCM cs);
+	alias da_scm_char_set_cursor = SCM function(SCM cs);
+	alias da_scm_char_set_ref = SCM function(SCM cs, SCM cursor);
+	alias da_scm_char_set_cursor_next = SCM function(SCM cs, SCM cursor);
+	alias da_scm_end_of_char_set_p = SCM function(SCM cursor);
+	alias da_scm_char_set_fold = SCM function(SCM kons, SCN knil, SCM cs);
+	alias da_scm_char_set_unfold = SCM function(SCN p, SCM f, SCM g, SCM seed, SCM base, SCM base_cs);
+	alias da_scm_char_set_unfold_x = SCM function(SCM p, SCM f, SCM g, SCM seed, SCM base, SCM base_cs);
+	alias da_scm_char_set_for_each = SCM function(SCM proc, SCM cs);
+	alias da_scm_char_set_map = SCM function(SCM proc, SCM cs);
 
 	//6.6.4.3 Creating Character Sets
-	//alias da_scm_char_set_copy = SCM function(SCM cs);
-	//alias da_scm_char_set = SCM function(SCM chrs);
-	//alias da_scm_list_to_char_set = SCM function(SCM list, SCM base_cs);
-	//alias da_scm_list_to_char_set_x = SCM function(SCM list, SCM base_cs);
-	//alias da_scm_string_to_char_set = SCM function(SCM str, SCM base_cs);
-	//alias da_scm_string_to_char_set_x = SCM function(SCM str, SCM base_cs);
-	//alias da_scm_char_set_filter = SCM function(SCM pred, SCM cs, SCM base_cs);
-	//alias da_scm_char_set_filter_x = SCM function(SCM pred, SCM cs, SCM base_cs);
-	//alias da_scm_ucs_range_to_char_set = SCM function(SCM lower, SCM upper, SCM error, SCM base_cs);
-	//alias da_scm_ucs_range_to_char_set_x = SCM function(SCM lower, SCM upper, SCM error, SCM base_cs);
-	//alias da_scm_to_char_set = SCM function(SCM x);
+	alias da_scm_char_set_copy = SCM function(SCM cs);
+	alias da_scm_char_set = SCM function(SCM chrs);
+	alias da_scm_list_to_char_set = SCM function(SCM list, SCM base_cs);
+	alias da_scm_list_to_char_set_x = SCM function(SCM list, SCM base_cs);
+	alias da_scm_string_to_char_set = SCM function(SCM str, SCM base_cs);
+	alias da_scm_string_to_char_set_x = SCM function(SCM str, SCM base_cs);
+	alias da_scm_char_set_filter = SCM function(SCM pred, SCM cs, SCM base_cs);
+	alias da_scm_char_set_filter_x = SCM function(SCM pred, SCM cs, SCM base_cs);
+	alias da_scm_ucs_range_to_char_set = SCM function(SCM lower, SCM upper, SCM error, SCM base_cs);
+	alias da_scm_ucs_range_to_char_set_x = SCM function(SCM lower, SCM upper, SCM error, SCM base_cs);
+	alias da_scm_to_char_set = SCM function(SCM x);
 
 	//6.6.4.4 Querying Character Sets
 	alias da_scm_char_set_size = SCM function(SCM cs);
@@ -341,7 +342,7 @@ extern(C) @nogc nothrow {
 	alias da_scm_string_split = SCM function(SCM str, SCM char_pred);
 
 	//6.6.5.5 String Selection
-	alias da_scm_string_length = SCM function(SCM string);
+	alias da_scm_string_length = SCM function(SCM str);
 	alias da_scm_c_string_length = size_t function(SCM str);
 	alias da_scm_string_ref = SCM function(SCM str, SCM k);
 	alias da_scm_c_string_ref = SCM function(SCM str, size_t k);
@@ -590,7 +591,7 @@ extern(C) @nogc nothrow {
 	alias da_scm_from_locale_keywordn = SCM function(const char * name, size_t len);
 	alias da_scm_from_latin1_keyword = SCM function(const char * name);
 	alias da_scm_from_utf8_keyword = SCM function(const char * name);
-	alias da_scm_c_bind_keyword_arguments = void function(const char * subr, SCM rest, scm_t_keyword_arguments_flags flags, SCM keyword1, SCM * argp1, SCM …, SCM keywordN, SCM * argpN, SCM SCM_UNDEFINED);
+	alias da_scm_c_bind_keyword_arguments = void function(const char * subr, SCM rest, scm_t_keyword_arguments_flags flags, SCM keyword1, SCM * argp1, ..., SCM keywordN, SCM * argpN, SCM_UNDEFINED);
 
 	//6.7.1 Pairs
 	alias da_scm_cons = SCM function(SCM x, SCM y);
@@ -640,7 +641,7 @@ extern(C) @nogc nothrow {
 	alias da_scm_list_3 = SCM function(SCM elem1, SCM elem2, SCM elem3);
 	alias da_scm_list_4 = SCM function(SCM elem1, SCM elem2, SCM elem3, SCM elem4);
 	alias da_scm_list_5 = SCM function(SCM elem1, SCM elem2, SCM elem3, SCM elem4, SCM elem5);
-	alias da_scm_list_n = SCM function(SCM elem1, SCM …, SCM elemN, SCM SCM_UNDEFINED);
+	alias da_scm_list_n = SCM function(SCM elem1, ..., SCM elemN, SCM_UNDEFINED);
 	alias da_scm_list_copy = SCM function(SCM lst);
 
 	//6.7.2.4 List Selection
@@ -1090,7 +1091,7 @@ extern(C) @nogc nothrow {
 
 	//6.14.9.2 String Ports
 	alias da_scm_call_with_output_string = SCM function(SCM proc);
-	alias da_scm_call_with_input_string = SCM function(SCM string, SCM proc);
+	alias da_scm_call_with_input_string = SCM function(SCM str, SCM proc);
 	alias da_scm_open_input_string = SCM function(SCM str);
 	alias da_scm_get_output_string = SCM function(SCM port);
 
