@@ -1,5 +1,8 @@
 module derelict.guile;
 
+import core.stdc.config : c_long, c_ulong;
+import std.socket : sockaddr;
+
 private {
 
 	import derelict.util.loader;
@@ -13,10 +16,12 @@ private {
 
 }
 
+alias ssize_t = long;
 alias scm_t_intptr = int*;
 alias scm_t_uintptr = uint*;
 alias scm_t_bits = scm_t_uintptr;
 alias scm_t_signed_bits = scm_t_intptr;
+alias SCM = scm_t_bits;
 
 alias scm_t_int8 = byte;
 alias scm_t_uint8 = ubyte;
@@ -30,10 +35,158 @@ alias scm_t_intmax = long;
 alias scm_t_uintmax = ulong;
 
 alias scm_t_ptrdiff = ptrdiff_t;
+alias scm_t_wchar = scm_t_int32;
+
+enum {
+	SCM_ICONVEH_ERROR = 0,
+	SCM_ICONVEH_QUESTION_MARK = 1,
+	SCM_ICONVEH_ESCAPE_SEQUENCE = 2
+}
+
+enum scm_t_string_failed_conversion_handler {
+	SCM_FAILED_CONVERSION_ERROR = SCM_ICONVEH_ERROR,
+	SCM_FAILED_CONVERSION_ERROR_QUESTION_MARK = SCM_ICONVEH_QUESTION_MARK,
+	SCM_FAILED_CONVERSION_ESCAPE_SEQUENCE = SCM_ICONVEH_ESCAPE_SEQUENCE
+}
+
+alias scm_t_keyword_arguments_flags = int;
+enum : int {
+	SCM_ALLOW_OTHER_KEYS = (1U << 0),
+	SCM_ALLOW_NON_KEYWORD_ARGUMENTS = (1U << 1)
+}
+
+struct scm_print_state {
+
+  SCM handle;			/* Struct handle */
+  int revealed;                 /* Has the state escaped to Scheme? */
+  c_ulong writingp;	/* Writing? */
+  c_ulong fancyp;		/* Fancy printing? */
+  c_ulong level;		/* Max level */
+  c_ulong length;		/* Max number of objects per level */
+  SCM hot_ref;			/* Hot reference */
+  c_ulong list_offset;
+  c_ulong top;		/* Top of reference stack */
+  c_ulong ceiling;	/* Max size of reference stack */
+  SCM ref_vect;	 	        /* Stack of references used during
+				   				circular reference detection;
+				   				a simple vector. */
+  SCM highlight_objects;        /* List of objects to be highlighted */
+
+}
+
+enum {
+	SCM_DYNSTACK_TAG_FLAGS_SHIFT = 4
+}
+
+alias scm_t_dynstack_frame_flags = int;
+enum : int {
+	SCM_F_DYNSTACK_FRAME_REWINDABLE = (1 << SCM_DYNSTACK_TAG_FLAGS_SHIFT)
+}
+
+alias scm_t_dynstack_winder_flags = int;
+enum : int {
+	SCM_F_DYNSTACK_WINDER_EXPLICIT = (1 << SCM_DYNSTACK_TAG_FLAGS_SHIFT)
+}
+
+alias scm_t_wind_flags = int;
+enum : int {
+	SCM_F_WIND_EXPLICITLY = SCM_F_DYNSTACK_WINDER_EXPLICIT
+}
+
+alias scm_t_dynwind_flags = int;
+enum : int {
+	SCM_F_DYNWIND_REWINDABLE = SCM_F_DYNSTACK_FRAME_REWINDABLE
+}
+
+alias scm_t_catch_body = extern(C) nothrow @nogc SCM function(void* data);
+alias scm_t_catch_handler = extern(C) nothrow @nogc SCM function(void* data, SCM tag, SCM throw_args);
+
+alias scm_t_c_hook_function = extern(C) nothrow @nogc void* function(void* hook_data, void* fn_data, void* data);
+
+alias scm_t_c_hook_type = int;
+enum : int {
+
+	SCM_C_HOOK_NORMAL,
+	SCM_C_HOOK_OR,
+	SCM_C_HOOK_AND
+
+}
+
+struct scm_t_c_hook_entry {
+
+	scm_t_c_hook_entry* next;
+	scm_t_c_hook_function func;
+	void* data;
+
+}
+
+struct scm_t_c_hook {
+
+	scm_t_c_hook_entry* first;
+	scm_t_c_hook_type type;
+	void* data;	
+
+}
+
+enum : int {
+
+    SCM_ARRAY_ELEMENT_TYPE_SCM = 0,   /* SCM values */
+    SCM_ARRAY_ELEMENT_TYPE_CHAR = 1,  /* characters */
+    SCM_ARRAY_ELEMENT_TYPE_BIT = 2,   /* packed numeric values */
+    SCM_ARRAY_ELEMENT_TYPE_VU8 = 3,
+    SCM_ARRAY_ELEMENT_TYPE_U8 = 4,
+    SCM_ARRAY_ELEMENT_TYPE_S8 = 5,
+    SCM_ARRAY_ELEMENT_TYPE_U16 = 6,
+    SCM_ARRAY_ELEMENT_TYPE_S16 = 7,
+    SCM_ARRAY_ELEMENT_TYPE_U32 = 8,
+    SCM_ARRAY_ELEMENT_TYPE_S32 = 9,
+    SCM_ARRAY_ELEMENT_TYPE_U64 = 10,
+    SCM_ARRAY_ELEMENT_TYPE_S64 = 11,
+    SCM_ARRAY_ELEMENT_TYPE_F32 = 12,
+    SCM_ARRAY_ELEMENT_TYPE_F64 = 13,
+    SCM_ARRAY_ELEMENT_TYPE_C32 = 14,
+    SCM_ARRAY_ELEMENT_TYPE_C64 = 15,
+    SCM_ARRAY_ELEMENT_TYPE_LAST = 15
+
+}
+
+alias scm_t_array_element_type = int;
+alias scm_i_t_array_ref = extern(C) nothrow @nogc SCM function(scm_t_array_handle*, size_t);
+alias scm_i_t_array_set = extern(C) nothrow @nogc void function(scm_t_array_handle*, size_t, SCM);
+
+struct scm_t_array_dim {
+
+	ssize_t lbnd;
+	ssize_t ubnd;
+	ssize_t inc;
+
+}
+
+struct scm_t_array_implementation {
+
+	scm_t_bits tag;
+	scm_t_bits mask;
+	scm_i_t_array_ref vref;
+	scm_i_t_array_set vset;
+	extern(C) nothrow @nogc void function(SCM, scm_t_array_handle*) get_handle;
+
+}
+
+struct scm_t_array_handle {
+
+	SCM array;
+	scm_t_array_implementation *impl;
+	size_t base;
+	size_t ndims;
+	scm_t_array_dim* dims;
+	scm_t_array_dim dim0;
+	scm_t_array_element_type element_type;
+	const void* elements;
+	void* writable_elements;
+
+}
 
 extern(C) @nogc nothrow {
-
-	import core.stdc.config : c_long, c_ulong;
 
 	//6.4 Initializing Guile
 	alias da_scm_with_guile = void* function(void* function(void*), void* data);
@@ -56,7 +209,7 @@ extern(C) @nogc nothrow {
 	alias da_scm_integer_p = SCM function(SCM x);
 	alias da_scm_is_integer = int function(SCM x);
 	alias da_scm_exact_integer_p = SCM function(SCM x);
-	alias da_scm_is_exact_inteer = int function(SCM x);
+	alias da_scm_is_exact_integer = int function(SCM x);
 	alias da_scm_is_signed_integer = int function(SCM x, scm_t_intmax min, scm_t_intmax max);
 	alias da_scm_is_unsigned_integer = int function(SCM x, scm_t_uintmax min, scm_t_uintmax max);
 	alias da_scm_to_signed_integer = scm_t_intmax function(SCM x, scm_t_intmax min, scm_t_intmax max);
@@ -100,7 +253,7 @@ extern(C) @nogc nothrow {
 	alias da_scm_from_long_long = SCM function(long x);
 	alias da_scm_from_ulong_long = SCM function(ulong x);
 	alias da_scm_from_size_t = SCM function(size_t x);
-	alias da_scm_from_ssize_t = SCM function(scm_t_ssize_t x);
+	alias da_scm_from_ssize_t = SCM function(ssize_t x);
 	alias da_scm_from_ptrdiff_t = SCM function(ptrdiff_t x);
 	alias da_scm_from_int8 = SCM function(scm_t_int8 x);
 	alias da_scm_from_uint8 = SCM function(scm_t_uint8 x);
@@ -113,8 +266,10 @@ extern(C) @nogc nothrow {
 	alias da_scm_from_intmax = SCM function(scm_t_intmax x);
 	alias da_scm_from_uintmax = SCM function(scm_t_uintmax x);
 
+	/* not included FOR NOW
 	alias da_scm_to_mpz = void function(SCM val, mpz_t rop);
 	alias da_scm_from_mpz = SCM function(mpz_t val);
+	*/
 
 	//6.6.2.3 Real and Rational Numbers
 	alias da_scm_real_p = SCM function(SCM obj);
@@ -139,6 +294,7 @@ extern(C) @nogc nothrow {
 	//6.6.2.5 Exact and Inexact Numbers
 	alias da_scm_exact_p = SCM function(SCM z);
 	alias da_scm_is_exact = int function(SCM z);
+	alias da_scm_inexact_p = int function(SCM z);
 	alias da_scm_is_inexact_p = SCM function(SCM z);
 	alias da_scm_is_inexact = int function(SCM z);
 	alias da_scm_inexact_to_exact = SCM function(SCM z);
@@ -201,8 +357,8 @@ extern(C) @nogc nothrow {
 	alias da_scm_c_truncate = double function(double x);
 	alias da_scm_c_round = double function(double x);
 	alias da_scm_euclidean_divide = void function(SCM x, SCM y, SCM *q, SCM *r);
-	alias da_scm_eucidean_quotient = SCM function(SCM x, SCM y);
-	alias da_scm_euclidean_reaminder = SCM function(SCM x, SCM y);
+	alias da_scm_euclidean_quotient = SCM function(SCM x, SCM y);
+	alias da_scm_euclidean_remainder = SCM function(SCM x, SCM y);
 	alias da_scm_floor_divide = void function(SCM x, SCM y, SCM *q, SCM *r);
 	alias da_scm_floor_quotient = SCM function(SCM x, SCM y);
 	alias da_scm_floor_remainder = SCM function(SCM x, SCM y);
@@ -211,8 +367,9 @@ extern(C) @nogc nothrow {
 	alias da_scm_ceiling_remainder = SCM function(SCM x, SCM y);
 	alias da_scm_truncate_divide = void function(SCM x, SCM y, SCM *q, SCM *r);
 	alias da_scm_truncate_quotient = SCM function(SCM x, SCM y);
-	alias da_scm_trucnate_remainder = SCM function(SCM x, SCM y);
+	alias da_scm_truncate_remainder = SCM function(SCM x, SCM y);
 	alias da_scm_centered_divide = void function(SCM x, SCM y, SCM *q, SCM *r);
+	alias da_scm_centered_quotient = void function(SCM x, SCM y);
 	alias da_scm_centered_remainder = void function(SCM x, SCM y);
 	alias da_scm_round_divide = void function(SCM x, SCM y, SCM *q, SCM *r);
 	alias da_scm_round_quotient = SCM function(SCM x, SCM y);
@@ -221,7 +378,7 @@ extern(C) @nogc nothrow {
 	//6.6.2.12 Bitwise Operations
 	alias da_scm_logand = SCM function(SCM n1, SCM n2);
 	alias da_scm_logior = SCM function(SCM n1, SCM n2);
-	alias da_scm_logxor = SCM function(SCM n1, SCM n2);
+	alias da_scm_loxor = SCM function(SCM n1, SCM n2);
 	alias da_scm_lognot = SCM function(SCM n);
 	alias da_scm_logtest = SCM function(SCM j, SCM k);
 	alias da_scm_logbit_p = SCM function(SCM index, SCM j);
@@ -258,14 +415,14 @@ extern(C) @nogc nothrow {
 	alias da_scm_char_to_integer = SCM function(SCM chr);
 	alias da_scm_integer_to_char = SCM function(SCM n);
 	alias da_scm_char_upcase = SCM function(SCM chr);
-	alias da_scm_char_downcaes = SCM function(SCM chr);
+	alias da_scm_char_downcase = SCM function(SCM chr);
 	alias da_scm_char_titlecase = SCM function(SCM chr);
 	alias da_scm_c_upcase = scm_t_wchar function(scm_t_wchar c);
 	alias da_scm_c_downcase = scm_t_wchar function(scm_t_wchar c);
 	alias da_scm_c_titlecase = scm_t_wchar function(scm_t_wchar c);
 
 	//6.6.4.1 Character Set Predicates/Comparison
-	alias da_scm_set_p = SCM function(SCM obj);
+	alias da_scm_char_set_p = SCM function(SCM obj);
 	alias da_scm_char_set_eq = SCM function(SCM char_sets);
 	alias da_scm_char_set_leq = SCM function(SCM char_sets);
 	alias da_scm_char_set_hash = SCM function(SCM cs, SCM bound);
@@ -275,8 +432,8 @@ extern(C) @nogc nothrow {
 	alias da_scm_char_set_ref = SCM function(SCM cs, SCM cursor);
 	alias da_scm_char_set_cursor_next = SCM function(SCM cs, SCM cursor);
 	alias da_scm_end_of_char_set_p = SCM function(SCM cursor);
-	alias da_scm_char_set_fold = SCM function(SCM kons, SCN knil, SCM cs);
-	alias da_scm_char_set_unfold = SCM function(SCN p, SCM f, SCM g, SCM seed, SCM base, SCM base_cs);
+	alias da_scm_char_set_fold = SCM function(SCM kons, SCM knil, SCM cs);
+	alias da_scm_char_set_unfold = SCM function(SCM p, SCM f, SCM g, SCM seed, SCM base, SCM base_cs);
 	alias da_scm_char_set_unfold_x = SCM function(SCM p, SCM f, SCM g, SCM seed, SCM base, SCM base_cs);
 	alias da_scm_char_set_for_each = SCM function(SCM proc, SCM cs);
 	alias da_scm_char_set_map = SCM function(SCM proc, SCM cs);
@@ -350,7 +507,6 @@ extern(C) @nogc nothrow {
 	alias da_scm_string_copy = SCM function(SCM str);
 	alias da_scm_substring = SCM function(SCM str, SCM start, SCM end);
 	alias da_scm_substring_shared = SCM function(SCM str, SCM start, SCM end);
-	alias da_scm_substring_copy = SCM function(SCM str, SCM start, SCM end);
 	alias da_scm_substring_read_only = SCM function(SCM str, SCM start, SCM end);
 	alias da_scm_c_substring = SCM function(SCM str, size_t start, size_t end);
 	alias da_scm_c_substring_shared = SCM function(SCM str, size_t start, size_t end);
@@ -371,7 +527,6 @@ extern(C) @nogc nothrow {
 	alias da_scm_c_string_set_x = void function(SCM str, size_t k, SCM chr);
 	alias da_scm_substring_fill_x = SCM function(SCM str, SCM chr, SCM start, SCM end);
 	alias da_scm_string_fill_x = SCM function(SCM str, SCM chr);
-	alias da_scm_substring_fill_x = SCM function(SCM str, SCM start, SCM end, SCM fill);
 	alias da_scm_substring_move_x = SCM function(SCM str1, SCM start1, SCM end1, SCM str2, SCM start2);
 	alias da_scm_string_copy_x = SCM function(SCM target, SCM tstart, SCM s, SCM start, SCM end);
 
@@ -456,8 +611,6 @@ extern(C) @nogc nothrow {
 	alias da_scm_string_tokenize = SCM function(SCM s, SCM token_set, SCM start, SCM end);
 	alias da_scm_string_filter = SCM function(SCM char_pred, SCM s, SCM start, SCM end);
 	alias da_scm_string_delete = SCM function(SCM char_pred, SCM s, SCM start, SCM end);
-
-	//6.6.5.13 Representing Strings as Bytes
 
 	//6.6.5.14 Conversion to/from C
 	alias da_scm_from_locale_string = SCM function(const char * str);
@@ -561,7 +714,7 @@ extern(C) @nogc nothrow {
 	alias da_scm_symbol_p = SCM function(SCM obj);
 	alias da_scm_is_symbol = int function(SCM val);
 	alias da_scm_symbol_to_string = SCM function(SCM s);
-	alias da_scm_string_to_symbol = SCM function(SCM string);
+	alias da_scm_string_to_symbol = SCM function(SCM str);
 	alias da_scm_string_ci_to_symbol = SCM function(SCM str);
 	alias da_scm_from_latin1_symbol = SCM function(const char * name);
 	alias da_scm_from_utf8_symbol = SCM function(const char * name);
@@ -591,7 +744,7 @@ extern(C) @nogc nothrow {
 	alias da_scm_from_locale_keywordn = SCM function(const char * name, size_t len);
 	alias da_scm_from_latin1_keyword = SCM function(const char * name);
 	alias da_scm_from_utf8_keyword = SCM function(const char * name);
-	alias da_scm_c_bind_keyword_arguments = void function(const char * subr, SCM rest, scm_t_keyword_arguments_flags flags, SCM keyword1, SCM * argp1, ..., SCM keywordN, SCM * argpN, SCM_UNDEFINED);
+	alias da_scm_c_bind_keyword_arguments = void function(const char * subr, SCM rest, scm_t_keyword_arguments_flags flags, SCM keyword1, SCM * argp1, ...);
 
 	//6.7.1 Pairs
 	alias da_scm_cons = SCM function(SCM x, SCM y);
@@ -641,7 +794,7 @@ extern(C) @nogc nothrow {
 	alias da_scm_list_3 = SCM function(SCM elem1, SCM elem2, SCM elem3);
 	alias da_scm_list_4 = SCM function(SCM elem1, SCM elem2, SCM elem3, SCM elem4);
 	alias da_scm_list_5 = SCM function(SCM elem1, SCM elem2, SCM elem3, SCM elem4, SCM elem5);
-	alias da_scm_list_n = SCM function(SCM elem1, ..., SCM elemN, SCM_UNDEFINED);
+	alias da_scm_list_n = SCM function(SCM elem1, ...);
 	alias da_scm_list_copy = SCM function(SCM lst);
 
 	//6.7.2.4 List Selection
@@ -703,8 +856,6 @@ extern(C) @nogc nothrow {
 	alias da_scm_vector_elements = const SCM * function(SCM vec, scm_t_array_handle * handle, size_t * lenp, ssize_t * incp);
 	alias da_scm_vector_writable_elements = SCM * function(SCM vec, scm_t_array_handle * handle, size_t * lenp, ssize_t * incp);
 
-	//6.7.3.5 Uniform Numeric Vectors
-
 	//6.7.4 Bit Vectors
 	alias da_scm_bitvector_p = SCM function(SCM obj);
 	alias da_scm_is_bitvector = int function(SCM obj);
@@ -720,11 +871,11 @@ extern(C) @nogc nothrow {
 	alias da_scm_bitvector_fill_x = SCM function(SCM vec, SCM val);
 	alias da_scm_list_to_bitvector = SCM function(SCM list);
 	alias da_scm_bitvector_to_list = SCM function(SCM vec);
-	alias da_scm_bit_count = SCM function(SCM bool, SCM bitvector);
-	alias da_scm_bit_position = SCM function(SCM bool, SCM bitvector, SCM start);
+	alias da_scm_bit_count = SCM function(SCM boolean, SCM bitvector);
+	alias da_scm_bit_position = SCM function(SCM boolean, SCM bitvector, SCM start);
 	alias da_scm_bit_invert_x = SCM function(SCM bitvector);
-	alias da_scm_bit_set_star_x = SCM function(SCM bitvector, SCM uvec, SCM bool);
-	alias da_scm_bit_count_star = SCM function(SCM bitvector, SCM uvec, SCM bool);
+	alias da_scm_bit_set_star_x = SCM function(SCM bitvector, SCM uvec, SCM boolean);
+	alias da_scm_bit_count_star = SCM function(SCM bitvector, SCM uvec, SCM boolean);
 	alias da_scm_bitvector_elements = const scm_t_uint32 * function(SCM vec, scm_t_array_handle * handle, size_t * offp, size_t * lenp, ssize_t * incp);
 	alias da_scm_bitvector_writable_elements = scm_t_uint32 * function(SCM vec, scm_t_array_handle * handle, size_t * offp, size_t * lenp, ssize_t * incp);
 
@@ -805,7 +956,7 @@ extern(C) @nogc nothrow {
 	//6.7.10.2 Structure Basics
 	alias da_scm_make_struct = SCM function(SCM vtable, SCM tail_size, SCM init_list);
 	alias da_scm_c_make_struct = SCM function(SCM vtable, SCM tail_size, SCM init, ...);
-	alias da_scm_c_make_structv = SCM function(SCM vtable, SCM tail_size, size_t n_inits, scm_t_bits init[]);
+	alias da_scm_c_make_structv = SCM function(SCM vtable, SCM tail_size, size_t n_inits, scm_t_bits* init);
 	alias da_scm_struct_p = SCM function(SCM obj);
 	alias da_scm_struct_ref = SCM function(SCM strct, SCM n);
 	alias da_scm_struct_set_x = SCM function(SCM strct, SCM n, SCM value);
@@ -876,10 +1027,10 @@ extern(C) @nogc nothrow {
 	alias da_scm_hash_count = SCM function(SCM pred, SCM table);
 
 	//6.8 Smobs
-	alias da_scm_set_smob_free = void function(scm_t_bits tc, size_t (*free) (SCM obj));
-	alias da_scm_set_smob_mark = void function(scm_t_bits tc, SCM (*mark) (SCM obj));
-	alias da_scm_set_smob_print = void function(scm_t_bits tc, int (*print) (SCM obj, SCM port, scm_print_state* pstate));
-	alias da_scm_set_smob_equalp = void function(scm_t_bits tc, SCM (*equalp) (SCM obj1, SCM obj2));
+	alias da_scm_set_smob_free = void function(scm_t_bits tc, size_t function(SCM obj) free);
+	alias da_scm_set_smob_mark = void function(scm_t_bits tc, SCM function(SCM obj) mark);
+	alias da_scm_set_smob_print = void function(scm_t_bits tc, int function(SCM obj, SCM port, scm_print_state* pstate) print);
+	alias da_scm_set_smob_equalp = void function(scm_t_bits tc, SCM function (SCM obj1, SCM obj2) equalp);
 	alias da_scm_assert_smob_type = void function(scm_t_bits tag, SCM val);
 	alias da_scm_new_smob = SCM function(scm_t_bits tag, void * data);
 	alias da_scm_new_double_smob = SCM function(scm_t_bits tag, void * data, void * data2, void * data3);
@@ -968,7 +1119,7 @@ extern(C) @nogc nothrow {
 	alias da_scm_c_define = SCM function(const char * name, SCM value);
 
 	//6.12.4 Querying variable bindings
-	alias da_scm_defined_p = SCM function(SCM sym, SCM module);
+	alias da_scm_defined_p = SCM function(SCM sym, SCM modle);
 
 	//6.13.7 Returning and Accepting Multiple Values
 	alias da_scm_values = SCM function(SCM args);
@@ -979,12 +1130,12 @@ extern(C) @nogc nothrow {
 	//6.13.8.2 Catching Exceptions
 	alias da_scm_catch_with_pre_unwind_handler = SCM function(SCM key, SCM thunk, SCM handler, SCM pre_unwind_handler);
 	alias da_scm_catch = SCM function(SCM key, SCM thunk, SCM handler);
-	alias da_scm_c_catch = SCM function(SCM tag, scm_t_catch_body body, void * body_data, scm_t_catch_handler handler, void * handler_data, scm_t_catch_handler pre_unwind_handler, void * pre_unwind_handler_data);
-	alias da_scm_internal_catch = SCM function(SCM tag, scm_t_catch_body body, void * body_data, scm_t_catch_handler handler, void * handler_data);
+	alias da_scm_c_catch = SCM function(SCM tag, scm_t_catch_body c_body, void * body_data, scm_t_catch_handler handler, void * handler_data, scm_t_catch_handler pre_unwind_handler, void * pre_unwind_handler_data);
+	alias da_scm_internal_catch = SCM function(SCM tag, scm_t_catch_body c_body, void * body_data, scm_t_catch_handler handler, void * handler_data);
 
 	//6.13.8.3 Throw Handlers
 	alias da_scm_with_throw_handler = SCM function(SCM key, SCM thunk, SCM handler);
-	alias da_scm_c_with_throw_handler = SCM function(SCM tag, scm_t_catch_body body, void * body_data, scm_t_catch_handler handler, void * handler_data, int lazy_catch_p);
+	alias da_scm_c_with_throw_handler = SCM function(SCM tag, scm_t_catch_body c_body, void * body_data, scm_t_catch_handler handler, void * handler_data, int lazy_catch_p);
 
 	//6.13.8.4 Throwing Exceptions
 	alias da_scm_throw = SCM function(SCM key, SCM args);
@@ -996,10 +1147,10 @@ extern(C) @nogc nothrow {
 	//6.13.10 Dynamic Wind
 	alias da_scm_dynamic_wind = SCM function(SCM in_guard, SCM thunk, SCM out_guard);
 	alias da_scm_dynwind_begin = void function(scm_t_dynwind_flags flags);
-	alias da_scm_dynwind_unwind_handler = void function(void (*func)(void * ), void * data, scm_t_wind_flags flags);
-	alias da_scm_dynwind_unwind_handler_with_scm = void function(void (* func)(SCM), SCM data, scm_t_wind_flags flags);
-	alias da_scm_dynwind_rewind_handler = void function(void (*func)(void * ), void * data, scm_t_wind_flags flags);
-	alias da_scm_dynwind_rewind_handler_with_scm = void function(void (* func)(SCM), SCM data, scm_t_wind_flags flags);
+	alias da_scm_dynwind_unwind_handler = void function(void function(void * ) func, void * data, scm_t_wind_flags flags);
+	alias da_scm_dynwind_unwind_handler_with_scm = void function(void function(SCM) func, SCM data, scm_t_wind_flags flags);
+	alias da_scm_dynwind_rewind_handler = void function(void function(void * ) func, void * data, scm_t_wind_flags flags);
+	alias da_scm_dynwind_rewind_handler_with_scm = void function(void function(SCM) func, SCM data, scm_t_wind_flags flags);
 	alias da_scm_dynwind_free = void function(void * mem);
 
 	//6.13.11 How to Handle Errors
@@ -1019,7 +1170,7 @@ extern(C) @nogc nothrow {
 
 	//6.13.12 Continuation Barriers
 	alias da_scm_with_continuation_barrier = SCM function(SCM proc);
-	alias da_scm_c_with_continuation_barrier = void * function(void *(*func) (void * ), void * data);
+	alias da_scm_c_with_continuation_barrier = void * function(void * function(void *) func, void * data);
 
 	//6.14.1 Ports
 	alias da_scm_input_port_p = SCM function(SCM x);
@@ -1031,7 +1182,6 @@ extern(C) @nogc nothrow {
 	alias da_scm_port_conversion_strategy = SCM function(SCM port);
 
 	//6.14.2 Reading
-	alias da_scm_eof_object_p = SCM function(SCM x);
 	alias da_scm_char_ready_p = SCM function(SCM port);
 	alias da_scm_read_char = SCM function(SCM port);
 	alias da_scm_c_read = size_t function(SCM port, void * buffer, size_t size);
@@ -1106,7 +1256,7 @@ extern(C) @nogc nothrow {
 
 	//6.14.10.8 Binary Input
 	alias da_scm_open_bytevector_input_port = SCM function(SCM bv, SCM transcoder);
-	alias da_scm_make_custom_binary_input_port = SCM function(SCM id, SCM read, SCM get-position, SCM set-position, SCM close);
+	alias da_scm_make_custom_binary_input_port = SCM function(SCM id, SCM read, SCM get_position, SCM set_position, SCM close);
 	alias da_scm_get_u8 = SCM function(SCM port);
 	alias da_scm_lookahead_u8 = SCM function(SCM port);
 	alias da_scm_get_bytevector_n = SCM function(SCM port, SCM count);
@@ -1117,7 +1267,7 @@ extern(C) @nogc nothrow {
 
 	//6.14.10.11 Binary Output
 	alias da_scm_open_bytevector_output_port = SCM function(SCM transcoder);
-	alias da_scm_make_custom_binary_output_port = SCM function(SCM id, SCM write, SCM get-position, SCM set-position, SCM close);
+	alias da_scm_make_custom_binary_output_port = SCM function(SCM id, SCM write, SCM get_position, SCM set_position, SCM close);
 	alias da_scm_put_u8 = SCM function(SCM port, SCM octet);
 	alias da_scm_put_bytevector = SCM function(SCM port, SCM bv, SCM start, SCM count);
 
@@ -1193,7 +1343,6 @@ extern(C) @nogc nothrow {
 	alias da_scm_gc_calloc = void * function(size_t size, const char * what);
 	alias da_scm_gc_free = void function(void * mem, size_t size, const char * what);
 	alias da_scm_gc_register_allocation = void function(size_t size);
-	alias da_scm_dynwind_free = void function(void * mem);
 
 	//6.18.3.1 Weak hash tables
 	alias da_scm_make_weak_key_hash_table = SCM function(SCM size);
@@ -1219,11 +1368,11 @@ extern(C) @nogc nothrow {
 	alias da_scm_variable_p = SCM function(SCM obj);
 
 	//6.19.8 Module System Reflection
-	alias da_scm_set_current_module = SCM function(SCM module);
+	alias da_scm_set_current_module = SCM function(SCM modle);
 	alias da_scm_resolve_module = SCM function(SCM name);
 
 	//6.19.9 Accessing Modules from C
-	alias da_scm_c_call_with_current_module = SCM function(SCM module, SCM (*func)(void * ), void * data);
+	alias da_scm_c_call_with_current_module = SCM function(SCM modle, SCM function(void *) func, void * data);
 	alias da_scm_public_variable = SCM function(SCM module_name, SCM name);
 	alias da_scm_c_public_variable = SCM function(const char * module_name, const char * name);
 	alias da_scm_private_variable = SCM function(SCM module_name, SCM name);
@@ -1238,16 +1387,14 @@ extern(C) @nogc nothrow {
 	alias da_scm_c_private_ref = SCM function(const char * module_name, const char * name);
 	alias da_scm_c_lookup = SCM function(const char * name);
 	alias da_scm_lookup = SCM function(SCM name);
-	alias da_scm_c_module_lookup = SCM function(SCM module, const char * name);
-	alias da_scm_module_lookup = SCM function(SCM module, SCM name);
-	alias da_scm_module_variable = SCM function(SCM module, SCM name);
-	alias da_scm_c_define = SCM function(const char * name, SCM val);
-	alias da_scm_define = SCM function(SCM name, SCM val);
-	alias da_scm_c_module_define = SCM function(SCM module, const char * name, SCM val);
-	alias da_scm_module_define = SCM function(SCM module, SCM name, SCM val);
-	alias da_scm_module_ensure_local_variable = SCM function(SCM module, SCM sym);
-	alias da_scm_module_reverse_lookup = SCM function(SCM module, SCM variable);
-	alias da_scm_c_define_module = SCM function(const char * name, void (*init)(void * ), void * data);
+	alias da_scm_c_module_lookup = SCM function(SCM modle, const char * name);
+	alias da_scm_module_lookup = SCM function(SCM modle, SCM name);
+	alias da_scm_module_variable = SCM function(SCM modle, SCM name);
+	alias da_scm_c_module_define = SCM function(SCM modle, const char * name, SCM val);
+	alias da_scm_module_define = SCM function(SCM modle, SCM name, SCM val);
+	alias da_scm_module_ensure_local_variable = SCM function(SCM modle, SCM sym);
+	alias da_scm_module_reverse_lookup = SCM function(SCM modle, SCM variable);
+	alias da_scm_c_define_module = SCM function(const char * name, void function(void *) init, void * data);
 	alias da_scm_c_resolve_module = SCM function(const char * name);
 	alias da_scm_c_use_module = SCM function(const char * name);
 	alias da_scm_c_export = SCM function(const char * name, ...);
@@ -1265,7 +1412,7 @@ extern(C) @nogc nothrow {
 	//6.20.5.2 Foreign Variables
 	alias da_scm_dynamic_pointer = SCM function(SCM name, SCM dobj);
 	alias da_scm_pointer_address = SCM function(SCM pointer);
-	alias da_scm_from_pointer = SCM function(void * ptr, void (*finalizer) (void* ));
+	alias da_scm_from_pointer = SCM function(void * ptr, void function (void*) finalizer);
 	alias da_scm_to_pointer = void* function(SCM obj);
 
 	//6.20.5.3 Void Pointers and Byte Access
@@ -1288,9 +1435,9 @@ extern(C) @nogc nothrow {
 	alias da_scm_system_async_mark = SCM function(SCM proc);
 	alias da_scm_system_async_mark_for_thread = SCM function(SCM proc, SCM thread);
 	alias da_scm_call_with_blocked_asyncs = SCM function(SCM proc);
-	alias da_scm_c_call_with_blocked_asyncs = void * function(void * (*proc) (void * data), void * data);
+	alias da_scm_c_call_with_blocked_asyncs = void * function(void * function(void * data) proc, void * data);
 	alias da_scm_call_with_unblocked_asyncs = SCM function(SCM proc);
-	alias da_scm_c_call_with_unblocked_asyncs = void * function(void *(*proc) (void * data), void * data);
+	alias da_scm_c_call_with_unblocked_asyncs = void * function(void * function(void * data) proc, void * data);
 
 	//6.21.2.2 User asyncs
 	alias da_scm_async = SCM function(SCM thunk);
@@ -1298,7 +1445,7 @@ extern(C) @nogc nothrow {
 	alias da_scm_run_asyncs = SCM function(SCM list_of_a);
 
 	//6.21.3 Threads
-	alias da_scm_spawn_thread = SCM function(scm_t_catch_body body, void * body_data, scm_t_catch_handler handler, void * handler_data);
+	alias da_scm_spawn_thread = SCM function(scm_t_catch_body c_body, void * body_data, scm_t_catch_handler handler, void * handler_data);
 	alias da_scm_thread_p = SCM function(SCM obj);
 	alias da_scm_join_thread = SCM function(SCM thread);
 	alias da_scm_join_thread_timed = SCM function(SCM thread, SCM timeout, SCM timeoutval);
@@ -1347,8 +1494,8 @@ extern(C) @nogc nothrow {
 	alias da_scm_fluid_bound_p = SCM function(SCM fluid);
 	alias da_scm_with_fluid = SCM function(SCM fluid, SCM value, SCM thunk);
 	alias da_scm_with_fluids = SCM function(SCM fluids, SCM values, SCM thunk);
-	alias da_scm_c_with_fluids = SCM function(SCM fluids, SCM vals, SCM (*cproc)(void * ), void * data);
-	alias da_scm_c_with_fluid = SCM function(SCM fluid, SCM val, SCM (*cproc)(void * ), void * data);
+	alias da_scm_c_with_fluids = SCM function(SCM fluids, SCM vals, SCM function(void *) cproc, void * data);
+	alias da_scm_c_with_fluid = SCM function(SCM fluid, SCM val, SCM function(void * ) cproc, void * data);
 	alias da_scm_dynwind_fluid = void function(SCM fluid, SCM val);
 	alias da_scm_make_dynamic_state = SCM function(SCM parent);
 	alias da_scm_dynamic_state_p = SCM function(SCM obj);
@@ -1434,12 +1581,11 @@ extern(C) @nogc nothrow {
 	alias da_scm_open_fdes = SCM function(SCM path, SCM flags, SCM mode);
 	alias da_scm_close = SCM function(SCM fd_or_port);
 	alias da_scm_close_fdes = SCM function(SCM fd);
-	alias da_scm_unread_char = SCM function(SCM char, SCM port);
 	alias da_scm_dup_to_fdes = SCM function(SCM fd_or_port, SCM fd);
 	alias da_scm_redirect_port = SCM function(SCM old_port, SCM new_port);
 	alias da_scm_dup2 = SCM function(SCM oldfd, SCM newfd);
 	alias da_scm_port_for_each = SCM function(SCM proc);
-	alias da_scm_c_port_for_each = SCM function(void (* proc)(void, SCM SCM), void * data);
+	alias da_scm_c_port_for_each = SCM function(void function(void *, SCM SCM) proc, void * data);
 	alias da_scm_setvbuf = SCM function(SCM port, SCM mode, SCM size);
 	alias da_scm_fcntl = SCM function(SCM object, SCM cmd, SCM value);
 	alias da_scm_flock = SCM function(SCM file, SCM operation);
@@ -1455,7 +1601,7 @@ extern(C) @nogc nothrow {
 	alias da_scm_utime = SCM function(SCM pathname, SCM actime, SCM modtime, SCM actimens, SCM modtimens, SCM flags);
 	alias da_scm_delete_file = SCM function(SCM str);
 	alias da_scm_copy_file = SCM function(SCM oldfile, SCM newfile);
-	alias da_scm_sendfile = SCM function(SCM out, SCM in, SCM count, SCM offset);
+	alias da_scm_sendfile = SCM function(SCM outf, SCM inf, SCM count, SCM offset);
 	alias da_scm_rename = SCM function(SCM oldname, SCM newname);
 	alias da_scm_link = SCM function(SCM oldpath, SCM newpath);
 	alias da_scm_symlink = SCM function(SCM oldpath, SCM newpath);
@@ -1482,7 +1628,7 @@ extern(C) @nogc nothrow {
 	alias da_scm_gmtime = SCM function(SCM time);
 	alias da_scm_mktime = SCM function(SCM sbd_time, SCM zone);
 	alias da_scm_strftime = SCM function(SCM format, SCM tm);
-	alias da_scm_strptime = SCM function(SCM format, SCM string);
+	alias da_scm_strptime = SCM function(SCM format, SCM str);
 
 	//7.2.6 Runtime Environment
 	alias da_scm_set_program_arguments_scm = SCM function(SCM lst);
@@ -1558,9 +1704,9 @@ extern(C) @nogc nothrow {
 
 	//7.2.11.3 Network Socket Address
 	alias da_scm_make_socket_address = SCM function(SCM family, SCM address, SCM arglist);
-	alias da_scm_c_make_socket_address = struct sockaddr * function(SCM family, SCM address, SCM args, size_t * outsize);
-	alias da_scm_from_sockaddr = SCM function(const struct sockaddr * address, unsigned address_size);
-	alias da_scm_to_sockaddr = struct sockaddr * function(SCM address, size_t * address_size);
+	alias da_scm_c_make_socket_address = sockaddr * function(SCM family, SCM address, SCM args, size_t * outsize);
+	alias da_scm_from_sockaddr = SCM function(const sockaddr * address, uint address_size);
+	alias da_scm_to_sockaddr = sockaddr * function(SCM address, size_t * address_size);
 
 	//7.2.11.4 Network Sockets and Communication
 	alias da_scm_socket = SCM function(SCM family, SCM style, SCM proto);
@@ -1826,8 +1972,11 @@ __gshared {
 	da_scm_from_uint64 scm_from_uint64;
 	da_scm_from_intmax scm_from_intmax;
 	da_scm_from_uintmax scm_from_uintmax;
+
+	/* excluded for now 
 	da_scm_to_mpz scm_to_mpz;
 	da_scm_from_mpz scm_from_mpz;
+	*/
 
 	//6.6.2.3 Real and Rational Numbers
 	da_scm_real_p scm_real_p;
@@ -2057,10 +2206,8 @@ __gshared {
 	da_scm_string_ref scm_string_ref;
 	da_scm_c_string_ref scm_c_string_ref;
 	da_scm_substring_copy scm_substring_copy;
-	da_scm_string_copy scm_string_copy;
 	da_scm_substring scm_substring;
 	da_scm_substring_shared scm_substring_shared;
-	da_scm_substring_copy scm_substring_copy;
 	da_scm_substring_read_only scm_substring_read_only;
 	da_scm_c_substring scm_c_substring;
 	da_scm_c_substring_shared scm_c_substring_shared;
@@ -2081,9 +2228,9 @@ __gshared {
 	da_scm_c_string_set_x scm_c_string_set_x;
 	da_scm_substring_fill_x scm_substring_fill_x;
 	da_scm_string_fill_x scm_string_fill_x;
-	da_scm_substring_fill_x scm_substring_fill_x;
 	da_scm_substring_move_x scm_substring_move_x;
 	da_scm_string_copy_x scm_string_copy_x;
+	da_scm_string_copy scm_string_copy;
 
 	//6.6.5.7 String Comparison
 	da_scm_string_compare scm_string_compare;
@@ -2737,7 +2884,6 @@ __gshared {
 	da_scm_port_conversion_strategy scm_port_conversion_strategy;
 
 	//6.14.2 Reading
-	da_scm_eof_object_p scm_eof_object_p;
 	da_scm_char_ready_p scm_char_ready_p;
 	da_scm_read_char scm_read_char;
 	da_scm_c_read scm_c_read;
@@ -2899,7 +3045,6 @@ __gshared {
 	da_scm_gc_calloc scm_gc_calloc;
 	da_scm_gc_free scm_gc_free;
 	da_scm_gc_register_allocation scm_gc_register_allocation;
-	da_scm_dynwind_free scm_dynwind_free;
 
 	//6.18.3.1 Weak hash tables
 	da_scm_make_weak_key_hash_table scm_make_weak_key_hash_table;
@@ -2947,8 +3092,6 @@ __gshared {
 	da_scm_c_module_lookup scm_c_module_lookup;
 	da_scm_module_lookup scm_module_lookup;
 	da_scm_module_variable scm_module_variable;
-	da_scm_c_define scm_c_define;
-	da_scm_define scm_define;
 	da_scm_c_module_define scm_c_module_define;
 	da_scm_module_define scm_module_define;
 	da_scm_module_ensure_local_variable scm_module_ensure_local_variable;
@@ -3142,7 +3285,6 @@ __gshared {
 	da_scm_open_fdes scm_open_fdes;
 	da_scm_close scm_close;
 	da_scm_close_fdes scm_close_fdes;
-	da_scm_unread_char scm_unread_char;
 	da_scm_dup_to_fdes scm_dup_to_fdes;
 	da_scm_redirect_port scm_redirect_port;
 	da_scm_dup2 scm_dup2;
@@ -3540,8 +3682,11 @@ class DerelictGuileLoader : SharedLibLoader {
 		bindFunc(cast(void**)&scm_from_uint64, "scm_from_uint64");
 		bindFunc(cast(void**)&scm_from_intmax, "scm_from_intmax");
 		bindFunc(cast(void**)&scm_from_uintmax, "scm_from_uintmax");
+
+		/* excluded for now
 		bindFunc(cast(void**)&scm_to_mpz, "scm_to_mpz");
 		bindFunc(cast(void**)&scm_from_mpz, "scm_from_mpz");
+		*/
 
 		//6.6.2.3 Real and Rational Numbers
 		bindFunc(cast(void**)&scm_real_p, "scm_real_p");
@@ -3774,7 +3919,6 @@ class DerelictGuileLoader : SharedLibLoader {
 		bindFunc(cast(void**)&scm_string_copy, "scm_string_copy");
 		bindFunc(cast(void**)&scm_substring, "scm_substring");
 		bindFunc(cast(void**)&scm_substring_shared, "scm_substring_shared");
-		bindFunc(cast(void**)&scm_substring_copy, "scm_substring_copy");
 		bindFunc(cast(void**)&scm_substring_read_only, "scm_substring_read_only");
 		bindFunc(cast(void**)&scm_c_substring, "scm_c_substring");
 		bindFunc(cast(void**)&scm_c_substring_shared, "scm_c_substring_shared");
