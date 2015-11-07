@@ -1,8 +1,5 @@
 module derelict.guile;
 
-import core.stdc.config : c_long, c_ulong;
-import std.socket : sockaddr;
-
 private {
 
 	import derelict.util.loader;
@@ -16,175 +13,16 @@ private {
 
 }
 
-alias ssize_t = long;
-alias scm_t_intptr = int*;
-alias scm_t_uintptr = uint*;
-alias scm_t_bits = scm_t_uintptr;
-alias scm_t_signed_bits = scm_t_intptr;
-alias SCM = scm_t_bits;
-
-alias scm_t_int8 = byte;
-alias scm_t_uint8 = ubyte;
-alias scm_t_int16 = short;
-alias scm_t_uint16 = ushort;
-alias scm_t_int32 = int;
-alias scm_t_uint32 = uint;
-alias scm_t_int64 = long;
-alias scm_t_uint64 = ulong;
-alias scm_t_intmax = long;
-alias scm_t_uintmax = ulong;
-
-alias scm_t_ptrdiff = ptrdiff_t;
-alias scm_t_wchar = scm_t_int32;
-
-enum {
-	SCM_ICONVEH_ERROR = 0,
-	SCM_ICONVEH_QUESTION_MARK = 1,
-	SCM_ICONVEH_ESCAPE_SEQUENCE = 2
-}
-
-enum scm_t_string_failed_conversion_handler {
-	SCM_FAILED_CONVERSION_ERROR = SCM_ICONVEH_ERROR,
-	SCM_FAILED_CONVERSION_ERROR_QUESTION_MARK = SCM_ICONVEH_QUESTION_MARK,
-	SCM_FAILED_CONVERSION_ESCAPE_SEQUENCE = SCM_ICONVEH_ESCAPE_SEQUENCE
-}
-
-alias scm_t_keyword_arguments_flags = int;
-enum : int {
-	SCM_ALLOW_OTHER_KEYS = (1U << 0),
-	SCM_ALLOW_NON_KEYWORD_ARGUMENTS = (1U << 1)
-}
-
-struct scm_print_state {
-
-  SCM handle;			/* Struct handle */
-  int revealed;                 /* Has the state escaped to Scheme? */
-  c_ulong writingp;	/* Writing? */
-  c_ulong fancyp;		/* Fancy printing? */
-  c_ulong level;		/* Max level */
-  c_ulong length;		/* Max number of objects per level */
-  SCM hot_ref;			/* Hot reference */
-  c_ulong list_offset;
-  c_ulong top;		/* Top of reference stack */
-  c_ulong ceiling;	/* Max size of reference stack */
-  SCM ref_vect;	 	        /* Stack of references used during
-				   				circular reference detection;
-				   				a simple vector. */
-  SCM highlight_objects;        /* List of objects to be highlighted */
-
-}
-
-enum {
-	SCM_DYNSTACK_TAG_FLAGS_SHIFT = 4
-}
-
-alias scm_t_dynstack_frame_flags = int;
-enum : int {
-	SCM_F_DYNSTACK_FRAME_REWINDABLE = (1 << SCM_DYNSTACK_TAG_FLAGS_SHIFT)
-}
-
-alias scm_t_dynstack_winder_flags = int;
-enum : int {
-	SCM_F_DYNSTACK_WINDER_EXPLICIT = (1 << SCM_DYNSTACK_TAG_FLAGS_SHIFT)
-}
-
-alias scm_t_wind_flags = int;
-enum : int {
-	SCM_F_WIND_EXPLICITLY = SCM_F_DYNSTACK_WINDER_EXPLICIT
-}
-
-alias scm_t_dynwind_flags = int;
-enum : int {
-	SCM_F_DYNWIND_REWINDABLE = SCM_F_DYNSTACK_FRAME_REWINDABLE
-}
-
-alias scm_t_catch_body = extern(C) nothrow @nogc SCM function(void* data);
-alias scm_t_catch_handler = extern(C) nothrow @nogc SCM function(void* data, SCM tag, SCM throw_args);
-
-alias scm_t_c_hook_function = extern(C) nothrow @nogc void* function(void* hook_data, void* fn_data, void* data);
-
-alias scm_t_c_hook_type = int;
-enum : int {
-
-	SCM_C_HOOK_NORMAL,
-	SCM_C_HOOK_OR,
-	SCM_C_HOOK_AND
-
-}
-
-struct scm_t_c_hook_entry {
-
-	scm_t_c_hook_entry* next;
-	scm_t_c_hook_function func;
-	void* data;
-
-}
-
-struct scm_t_c_hook {
-
-	scm_t_c_hook_entry* first;
-	scm_t_c_hook_type type;
-	void* data;	
-
-}
-
-enum : int {
-
-    SCM_ARRAY_ELEMENT_TYPE_SCM = 0,   /* SCM values */
-    SCM_ARRAY_ELEMENT_TYPE_CHAR = 1,  /* characters */
-    SCM_ARRAY_ELEMENT_TYPE_BIT = 2,   /* packed numeric values */
-    SCM_ARRAY_ELEMENT_TYPE_VU8 = 3,
-    SCM_ARRAY_ELEMENT_TYPE_U8 = 4,
-    SCM_ARRAY_ELEMENT_TYPE_S8 = 5,
-    SCM_ARRAY_ELEMENT_TYPE_U16 = 6,
-    SCM_ARRAY_ELEMENT_TYPE_S16 = 7,
-    SCM_ARRAY_ELEMENT_TYPE_U32 = 8,
-    SCM_ARRAY_ELEMENT_TYPE_S32 = 9,
-    SCM_ARRAY_ELEMENT_TYPE_U64 = 10,
-    SCM_ARRAY_ELEMENT_TYPE_S64 = 11,
-    SCM_ARRAY_ELEMENT_TYPE_F32 = 12,
-    SCM_ARRAY_ELEMENT_TYPE_F64 = 13,
-    SCM_ARRAY_ELEMENT_TYPE_C32 = 14,
-    SCM_ARRAY_ELEMENT_TYPE_C64 = 15,
-    SCM_ARRAY_ELEMENT_TYPE_LAST = 15
-
-}
-
-alias scm_t_array_element_type = int;
-alias scm_i_t_array_ref = extern(C) nothrow @nogc SCM function(scm_t_array_handle*, size_t);
-alias scm_i_t_array_set = extern(C) nothrow @nogc void function(scm_t_array_handle*, size_t, SCM);
-
-struct scm_t_array_dim {
-
-	ssize_t lbnd;
-	ssize_t ubnd;
-	ssize_t inc;
-
-}
-
-struct scm_t_array_implementation {
-
-	scm_t_bits tag;
-	scm_t_bits mask;
-	scm_i_t_array_ref vref;
-	scm_i_t_array_set vset;
-	extern(C) nothrow @nogc void function(SCM, scm_t_array_handle*) get_handle;
-
-}
-
-struct scm_t_array_handle {
-
-	SCM array;
-	scm_t_array_implementation *impl;
-	size_t base;
-	size_t ndims;
-	scm_t_array_dim* dims;
-	scm_t_array_dim dim0;
-	scm_t_array_element_type element_type;
-	const void* elements;
-	void* writable_elements;
-
-}
+public import derelict.guile.types;
+public import derelict.guile.array_handle;
+public import derelict.guile.boolean;
+public import derelict.guile.dynstack;
+public import derelict.guile.dynwind;
+public import derelict.guile.hooks;
+public import derelict.guile.keywords;
+public import derelict.guile.print;
+public import derelict.guile.strings;
+public import derelict.guile.throwh;
 
 extern(C) @nogc nothrow {
 
