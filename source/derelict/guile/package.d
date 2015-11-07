@@ -804,12 +804,12 @@ extern(C) @nogc nothrow {
 
 	//6.7.10.2 Structure Basics
 	alias da_scm_make_struct = SCM function(SCM vtable, SCM tail_size, SCM init_list);
-	alias da_scm_c_make_struct = SCM function(SCM vtable, SCM tail_size, SCM init, SCM ...);
+	alias da_scm_c_make_struct = SCM function(SCM vtable, SCM tail_size, SCM init, ...);
 	alias da_scm_c_make_structv = SCM function(SCM vtable, SCM tail_size, size_t n_inits, scm_t_bits init[]);
 	alias da_scm_struct_p = SCM function(SCM obj);
-	alias da_scm_struct_ref = SCM function(SCM struct, SCM n);
-	alias da_scm_struct_set_x = SCM function(SCM struct, SCM n, SCM value);
-	alias da_scm_struct_vtable = SCM function(SCM struct);
+	alias da_scm_struct_ref = SCM function(SCM strct, SCM n);
+	alias da_scm_struct_set_x = SCM function(SCM strct, SCM n, SCM value);
+	alias da_scm_struct_vtable = SCM function(SCM strct);
 
 	//6.7.10.3 Vtable Contents
 	alias da_scm_struct_vtable_name = SCM function(SCM vtable);
@@ -1325,6 +1325,7 @@ extern(C) @nogc nothrow {
 	alias da_scm_broadcast_condition_variable = SCM function(SCM condvar);
 
 	//6.21.5 Blocking in Guile Mode
+	/* not included at the moment.
 	alias da_scm_without_guile = void * function(void *(*func) (void * ), void * data);
 	alias da_scm_pthread_mutex_lock = int function(pthread_mutex_t * mutex);
 	alias da_scm_pthread_cond_wait = int function(pthread_cond_t * cond, pthread_mutex_t * mutex);
@@ -1332,6 +1333,7 @@ extern(C) @nogc nothrow {
 	alias da_scm_std_select = int function(int nfds, fd_set * readfds, fd_set * writefds, fd_set * exceptfds, struct timeval * timeout);
 	alias da_scm_std_sleep = unsigned int function(unsigned int seconds);
 	alias da_scm_std_usleep = unsigned long function(unsigned long usecs);
+	*/
 
 	//6.21.6 Critical Sections
 	alias da_scm_dynwind_critical_section = void function(SCM mutex);
@@ -3031,6 +3033,7 @@ __gshared {
 	da_scm_broadcast_condition_variable scm_broadcast_condition_variable;
 
 	//6.21.5 Blocking in Guile Mode
+	/* not included at the moment
 	da_scm_without_guile scm_without_guile;
 	da_scm_pthread_mutex_lock scm_pthread_mutex_lock;
 	da_scm_pthread_cond_wait scm_pthread_cond_wait;
@@ -3038,6 +3041,7 @@ __gshared {
 	da_scm_std_select scm_std_select;
 	da_scm_std_sleep scm_std_sleep;
 	da_scm_std_usleep scm_std_usleep;
+	*/
 
 	//6.21.6 Critical Sections
 	da_scm_dynwind_critical_section scm_dynwind_critical_section;
@@ -4741,6 +4745,7 @@ class DerelictGuileLoader : SharedLibLoader {
 		bindFunc(cast(void**)&scm_broadcast_condition_variable, "scm_broadcast_condition_variable");
 
 		//6.21.5 Blocking in Guile Mode
+		/* not included at the moment
 		bindFunc(cast(void**)&scm_without_guile, "scm_without_guile");
 		bindFunc(cast(void**)&scm_pthread_mutex_lock, "scm_pthread_mutex_lock");
 		bindFunc(cast(void**)&scm_pthread_cond_wait, "scm_pthread_cond_wait");
@@ -4748,6 +4753,7 @@ class DerelictGuileLoader : SharedLibLoader {
 		bindFunc(cast(void**)&scm_std_select, "scm_std_select");
 		bindFunc(cast(void**)&scm_std_sleep, "scm_std_sleep");
 		bindFunc(cast(void**)&scm_std_usleep, "scm_std_usleep");
+		*/
 
 		//6.21.6 Critical Sections
 		bindFunc(cast(void**)&scm_dynwind_critical_section, "scm_dynwind_critical_section");
