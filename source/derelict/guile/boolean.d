@@ -19,51 +19,57 @@ __gshared {
 	}
 
 	char scm_to_char(SCM x) {
-		return 0;
+		return scm_to_uint8(x);
 	}
 
 	byte scm_to_schar(SCM x) {
-		return 0;
+		return scm_to_int8(x);
 	}
 
 	ubyte scm_to_uchar(SCM x) {
-		return 0;
+		return scm_to_uint8(x);
 	}
 
 	short scm_to_short(SCM x) {
-		return 0;
+		return 0; //look at numbers.h and validate.h
 	}
 
 	ushort scm_to_ushort(SCM x) {
-		return 0;
+		return 0; //ditto
 	}
 
 	int scm_to_int(SCM x) {
-		return 0;
+		return scm_to_int32(x); //or does it need a switch on platform...? probably?
 	}
 
 	uint scm_to_uint(SCM x) {
-		return 0;
+		return scm_to_uint32(x);
 	}
 
 	c_long scm_to_long(SCM x) {
-		return 0;
+		return scm_to_int32(x); //same problem here
 	}
 
 	c_ulong scm_to_ulong(SCM x) {
-		return 0;
+		return scm_to_uint32(x); //ditto
 	}
 
 	long scm_to_long_long(SCM x) {
-		return 0;
+		return scm_to_int64(x);
 	}
 
 	ulong scm_to_ulong_long(SCM x) {
-		return 0;
+		return scm_to_uint64(x);
 	}
 
 	size_t scm_to_size_t(SCM x) {
-		return 0;
+
+		static if (size_t.sizeof == 8) {
+			return scm_to_uint64(x);
+		} else static if (size_t.sizeof == 4) {
+			return scm_to_uint32(x);
+		}
+
 	}
 
 	ssize_t scm_to_ssize_t(SCM x) {

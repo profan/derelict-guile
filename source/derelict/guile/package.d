@@ -25,6 +25,36 @@ public import derelict.guile.tags;
 public import derelict.guile.throwh;
 public import derelict.guile.types;
 
+//globals from C
+extern(C) __gshared {
+
+	//6.6.4.6 Standard Character Sets
+	SCM scm_char_set_lower_case;
+	SCM scm_char_set_upper_case;
+	SCM scm_char_set_title_case;
+	SCM scm_char_set_letter;
+	SCM scm_char_set_digit;
+	SCM scm_char_set_letter_and_digit;
+	SCM scm_char_set_graphic;
+	SCM scm_char_set_printing;
+	SCM scm_char_set_whitespace;
+	SCM scm_char_set_blank;
+	SCM scm_char_set_iso_control;
+	SCM scm_char_set_punctuation;
+	SCM scm_char_set_symbol;
+	SCM scm_char_set_hex_digit;
+	SCM scm_char_set_ascii;
+	SCM scm_char_set_empty;
+	SCM scm_char_set_designated;
+	SCM scm_char_set_full;
+
+	//6.6.6.1 Endianness
+	SCM scm_endianness_big;
+	SCM scm_endianness_little;
+
+}
+
+//function prototypes from C
 extern(C) @nogc nothrow {
 
 	//6.4 Initializing Guile
@@ -436,6 +466,9 @@ extern(C) @nogc nothrow {
 	//6.6.5.15 String Internals
 	alias da_scm_string_bytes_per_char = SCM function(SCM str);
 	alias da_scm_sys_string_dump = SCM function(SCM str);
+	
+	//6.6.6.1 Endianness
+	alias da_scm_native_endianness = SCM function();
 
 	//6.6.6.2 Manipulating Bytevectors
 	alias da_scm_make_bytevector = SCM function(SCM len, SCM fill);
@@ -945,6 +978,7 @@ extern(C) @nogc nothrow {
 	//6.13.10 Dynamic Wind
 	alias da_scm_dynamic_wind = SCM function(SCM in_guard, SCM thunk, SCM out_guard);
 	alias da_scm_dynwind_begin = void function(scm_t_dynwind_flags flags);
+	alias da_scm_dynwind_end = void function();
 	alias da_scm_dynwind_unwind_handler = void function(void function(void * ) func, void * data, scm_t_wind_flags flags);
 	alias da_scm_dynwind_unwind_handler_with_scm = void function(void function(SCM) func, SCM data, scm_t_wind_flags flags);
 	alias da_scm_dynwind_rewind_handler = void function(void function(void * ) func, void * data, scm_t_wind_flags flags);
@@ -1000,6 +1034,7 @@ extern(C) @nogc nothrow {
 	alias da_scm_write_char = SCM function(SCM chr, SCM port);
 	alias da_scm_c_write = void function(SCM port, const void * buffer, size_t size);
 	alias da_scm_force_output = SCM function(SCM port);
+	alias da_scm_flush_all_ports = SCM function();
 
 	//6.14.4 Closing
 	alias da_scm_close_port = SCM function(SCM port);
@@ -1022,6 +1057,9 @@ extern(C) @nogc nothrow {
 	alias da_scm_write_string_partial = SCM function(SCM str, SCM port_or_fdes, SCM start, SCM end);
 
 	//6.14.8 Default Ports for Input, Output and Errors
+	alias da_scm_current_input_port = SCM function();
+	alias da_scm_current_output_port = SCM function();
+	alias da_scm_current_error_port = SCM function();
 	alias da_scm_set_current_input_port = SCM function(SCM port);
 	alias da_scm_set_current_output_port = SCM function(SCM port);
 	alias da_scm_set_current_error_port = SCM function(SCM port);
@@ -1041,6 +1079,7 @@ extern(C) @nogc nothrow {
 	alias da_scm_call_with_output_string = SCM function(SCM proc);
 	alias da_scm_call_with_input_string = SCM function(SCM str, SCM proc);
 	alias da_scm_open_input_string = SCM function(SCM str);
+	alias da_scm_open_output_string = SCM function();
 	alias da_scm_get_output_string = SCM function(SCM port);
 
 	//6.14.9.3 Soft Ports
@@ -1050,6 +1089,7 @@ extern(C) @nogc nothrow {
 	alias da_scm_sys_make_void_port = SCM function(SCM mode);
 
 	//6.14.10.5 The End-of-File Object
+	alias da_scm_eof_object = SCM function();
 	alias da_scm_eof_object_p = SCM function(SCM obj);
 
 	//6.14.10.8 Binary Input
@@ -1082,6 +1122,7 @@ extern(C) @nogc nothrow {
 
 	//6.17.4 Procedures for On the Fly Evaluation
 	alias da_scm_eval = SCM function(SCM exp, SCM module_or_state);
+	alias da_scm_interaction_environment = SCM function();
 	alias da_scm_eval_string = SCM function(SCM string);
 	alias da_scm_eval_string_in_module = SCM function(SCM string, SCM modle);
 	alias da_scm_c_eval_string = SCM function(const char * string);
@@ -1108,6 +1149,7 @@ extern(C) @nogc nothrow {
 	//6.17.6 Loading Scheme Code from File
 	alias da_scm_primitive_load = SCM function(SCM filename);
 	alias da_scm_c_primitive_load = SCM function(const char * filename);
+	alias da_scm_current_load_port = SCM function();
 
 	//6.17.7 Load Paths
 	alias da_scm_primitive_load_path = SCM function(SCM filename);
@@ -1127,9 +1169,12 @@ extern(C) @nogc nothrow {
 	alias da_scm_local_eval = SCM function(SCM exp, SCM env);
 
 	//6.18.1 Function related to Garbage Collection
+	alias da_scm_gc = SCM function();
 	alias da_scm_gc_protect_object = SCM function(SCM obj);
 	alias da_scm_gc_unprotect_object = SCM function(SCM obj);
 	alias da_scm_permanent_object = SCM function(SCM obj);
+	alias da_scm_gc_stats = SCM function();
+	alias da_sm_gc_live_object_stats = SCM function();
 
 	//6.18.2 Memory Blocks
 	alias da_scm_malloc = void * function(size_t size);
@@ -1157,7 +1202,11 @@ extern(C) @nogc nothrow {
 	alias da_scm_weak_vector_ref = SCM function(SCM wvect, SCM k);
 	alias da_scm_weak_vector_set_x = SCM function(SCM wvect, SCM k, SCM elt);
 
+	//6.18.4 Guardians
+	alias da_scm_make_guardian = SCM function();
+
 	//6.19.7 Variables
+	alias da_scm_make_undefined_variable = SCM function();
 	alias da_scm_make_variable = SCM function(SCM init);
 	alias da_scm_variable_bound_p = SCM function(SCM var);
 	alias da_scm_variable_ref = SCM function(SCM var);
@@ -1166,6 +1215,7 @@ extern(C) @nogc nothrow {
 	alias da_scm_variable_p = SCM function(SCM obj);
 
 	//6.19.8 Module System Reflection
+	alias da_scm_current_module SCM function();
 	alias da_scm_set_current_module = SCM function(SCM modle);
 	alias da_scm_resolve_module = SCM function(SCM name);
 
@@ -1236,6 +1286,8 @@ extern(C) @nogc nothrow {
 	alias da_scm_c_call_with_blocked_asyncs = void * function(void * function(void * data) proc, void * data);
 	alias da_scm_call_with_unblocked_asyncs = SCM function(SCM proc);
 	alias da_scm_c_call_with_unblocked_asyncs = void * function(void * function(void * data) proc, void * data);
+	alias da_scm_dynwind_block_asyncs = void function();
+	alias da_scm_dynwind_unblock_asyncs = void function();
 
 	//6.21.2.2 User asyncs
 	alias da_scm_async = SCM function(SCM thunk);
@@ -1243,6 +1295,8 @@ extern(C) @nogc nothrow {
 	alias da_scm_run_asyncs = SCM function(SCM list_of_a);
 
 	//6.21.3 Threads
+	alias da_scm_all_threads = SCM function();
+	alias da_scm_current_thread = SCM function();
 	alias da_scm_spawn_thread = SCM function(scm_t_catch_body c_body, void * body_data, scm_t_catch_handler handler, void * handler_data);
 	alias da_scm_thread_p = SCM function(SCM obj);
 	alias da_scm_join_thread = SCM function(SCM thread);
@@ -1253,6 +1307,7 @@ extern(C) @nogc nothrow {
 	alias da_scm_thread_cleanup = SCM function(SCM thread);
 
 	//6.21.4 Mutexes and Condition Variables
+	alias da_scm_make_mutex = SCM function();
 	alias da_scm_make_mutex_with_flags = SCM function(SCM flags);
 	alias da_scm_mutex_p = SCM function(SCM obj);
 	alias da_scm_lock_mutex = SCM function(SCM mutex);
@@ -1264,6 +1319,7 @@ extern(C) @nogc nothrow {
 	alias da_scm_mutex_owner = SCM function(SCM mutex);
 	alias da_scm_mutex_level = SCM function(SCM mutex);
 	alias da_scm_mutex_locked_p = SCM function(SCM mutex);
+	alias da_scm_make_condition_variable = SCM function();
 	alias da_scm_condition_variable_p = SCM function(SCM obj);
 	alias da_scm_wait_condition_variable = SCM function(SCM condvar, SCM mutex, SCM time);
 	alias da_scm_signal_condition_variable = SCM function(SCM condvar);
@@ -1284,7 +1340,9 @@ extern(C) @nogc nothrow {
 	alias da_scm_dynwind_critical_section = void function(SCM mutex);
 
 	//6.21.7 Fluids and Dynamic States
+	alias da_scm_make_fluid = SCM function();
 	alias da_scm_make_fluid_with_default = SCM function(SCM dflt);
+	alias da_scm_make_unbound_fluid = SCM function();
 	alias da_scm_fluid_p = SCM function(SCM obj);
 	alias da_scm_fluid_ref = SCM function(SCM fluid);
 	alias da_scm_fluid_set_x = SCM function(SCM fluid, SCM value);
@@ -1297,8 +1355,20 @@ extern(C) @nogc nothrow {
 	alias da_scm_dynwind_fluid = void function(SCM fluid, SCM val);
 	alias da_scm_make_dynamic_state = SCM function(SCM parent);
 	alias da_scm_dynamic_state_p = SCM function(SCM obj);
+	alias da_scm_current_dynamic_state = SCM function();
 	alias da_scm_set_current_dynamic_state = SCM function(SCM state);
 	alias da_scm_with_dynamic_state = SCM function(SCM state, SCM proc);
+
+	//6.22.1 Configuration, Build and Installation
+	alias da_scm_version = SCM function();
+	alias da_scm_effective_version = SCM function();
+	alias da_scm_major_version = SCM function();
+	alias da_scm_minor_version = SCM function();
+	alias da_scm_micro_version = SCM function();
+	alias da_scm_sys_package_data_dir = SCM function();
+	alias da_scm_sys_library_dir = SCM function();
+	alias da_scm_sys_site_dir = SCM function();
+	alias da_scm_sys_site_ccache_dir = SCM function();
 
 	//6.22.2.1 Feature Manipulation
 	alias da_scm_add_feature = void function(const char * str);
@@ -1366,6 +1436,7 @@ extern(C) @nogc nothrow {
 
 	//6.25.3.3 Pre-Unwind Debugging
 	alias da_scm_backtrace_with_highlights = SCM function(SCM highlights);
+	alias da_scm_backtrace = SCM function();
 
 	//7.2.2 Ports and File Descriptors
 	alias da_scm_port_revealed = SCM function(SCM port);
@@ -1379,6 +1450,7 @@ extern(C) @nogc nothrow {
 	alias da_scm_open_fdes = SCM function(SCM path, SCM flags, SCM mode);
 	alias da_scm_close = SCM function(SCM fd_or_port);
 	alias da_scm_close_fdes = SCM function(SCM fd);
+	alias da_scm_pipe = SCM function();
 	alias da_scm_dup_to_fdes = SCM function(SCM fd_or_port, SCM fd);
 	alias da_scm_redirect_port = SCM function(SCM old_port, SCM new_port);
 	alias da_scm_dup2 = SCM function(SCM oldfd, SCM newfd);
@@ -1410,8 +1482,11 @@ extern(C) @nogc nothrow {
 	alias da_scm_readdir = SCM function(SCM stream);
 	alias da_scm_rewinddir = SCM function(SCM stream);
 	alias da_scm_closedir = SCM function(SCM stream);
+	alias da_scm_sync = SCM function();
+	alias da_scm_tmpnam = SCM function();
 	alias da_scm_mknod = SCM function(SCM path, SCM type, SCM perms, SCM dev);
 	alias da_scm_mkstemp = SCM function(SCM tmpl);
+	alias da_scm_tmpfile = SCM function();
 	alias da_scm_dirname = SCM function(SCM filename);
 	alias da_scm_basename = SCM function(SCM filename, SCM suffix);
 
@@ -1420,15 +1495,23 @@ extern(C) @nogc nothrow {
 	alias da_scm_getpwuid = SCM function(SCM user);
 	alias da_scm_setgrent = SCM function(SCM arg);
 	alias da_scm_getgrgid = SCM function(SCM group);
+	alias da_scm_getlogin = SCM function();
 
 	//7.2.5 Time
+	alias da_scm_current_time = SCM function();
+	alias da_scm_gettimeofday = SCM function();
 	alias da_scm_localtime = SCM function(SCM time, SCM zone);
 	alias da_scm_gmtime = SCM function(SCM time);
 	alias da_scm_mktime = SCM function(SCM sbd_time, SCM zone);
+	alias da_scm_tzset = SCM function();
 	alias da_scm_strftime = SCM function(SCM format, SCM tm);
 	alias da_scm_strptime = SCM function(SCM format, SCM str);
+	alias da_scm_times = SCM function();
+	alias da_scm_get_internal_real_time = SCM function();
+	alias da_scm_get_internal_run_time = SCM function();
 
 	//7.2.6 Runtime Environment
+	alias da_scm_program_arguments = SCM function();
 	alias da_scm_set_program_arguments_scm = SCM function(SCM lst);
 	alias da_scm_set_program_arguments = void function(int argc, char ** argv, char * first);
 	alias da_scm_getenv = SCM function(SCM name);
@@ -1437,14 +1520,24 @@ extern(C) @nogc nothrow {
 
 	//7.2.7 Processes
 	alias da_scm_chdir = SCM function(SCM str);
+	alias da_scm_getcwd = SCM function();
 	alias da_scm_umask = SCM function(SCM mode);
 	alias da_scm_chroot = SCM function(SCM path);
+	alias da_scm_getpid = SCM function();
+	alias da_scm_getgroups = SCM function();
+	alias da_scm_getppid = SCM function();
+	alias da_scm_getuid = SCM function();
+	alias da_scm_getgid = SCM function();
+	alias da_scm_geteuid = SCM function();
+	alias da_scm_getegid = SCM function();
 	alias da_scm_setgroups = SCM function(SCM vec);
 	alias da_scm_setuid = SCM function(SCM id);
 	alias da_scm_setgid = SCM function(SCM id);
 	alias da_scm_seteuid = SCM function(SCM id);
 	alias da_scm_setegid = SCM function(SCM id);
+	alias da_scm_getpgrp = SCM function();
 	alias da_scm_setpgid = SCM function(SCM pid, SCM pgid);
+	alias da_scm_setsid = SCM function();
 	alias da_scm_getsid = SCM function(SCM pid);
 	alias da_scm_waitpid = SCM function(SCM pid, SCM options);
 	alias da_scm_status_exit_val = SCM function(SCM status);
@@ -1457,11 +1550,14 @@ extern(C) @nogc nothrow {
 	alias da_scm_execl = SCM function(SCM filename, SCM args);
 	alias da_scm_execlp = SCM function(SCM filename, SCM args);
 	alias da_scm_execle = SCM function(SCM filename, SCM env, SCM args);
+	alias da_scm_fork = SCM function();
 	alias da_scm_nice = SCM function(SCM incr);
 	alias da_scm_setpriority = SCM function(SCM which, SCM who, SCM prio);
 	alias da_scm_getpriority = SCM function(SCM which, SCM who);
 	alias da_scm_getaffinity = SCM function(SCM pid);
 	alias da_scm_setaffinity = SCM function(SCM pid, SCM mask);
+	alias da_scm_total_processor_count = SCM function();
+	alias da_scm_current_processor_count = SCM function();
 
 	//7.2.8 Signals
 	alias da_scm_kill = SCM function(SCM pid, SCM sig);
@@ -1469,6 +1565,7 @@ extern(C) @nogc nothrow {
 	alias da_scm_sigaction = SCM function(SCM signum, SCM handler, SCM flags);
 	alias da_scm_sigaction_for_thread = SCM function(SCM signum, SCM handler, SCM flags, SCM thread);
 	alias da_scm_alarm = SCM function(SCM i);
+	alias da_scm_pause = SCM function();
 	alias da_scm_sleep = SCM function(SCM secs);
 	alias da_scm_usleep = SCM function(SCM usecs);
 	alias da_scm_getitimer = SCM function(SCM which_timer);
@@ -1477,6 +1574,7 @@ extern(C) @nogc nothrow {
 	//7.2.9 Terminals and Ptys
 	alias da_scm_isatty_p = SCM function(SCM port);
 	alias da_scm_ttyname = SCM function(SCM port);
+	alias da_scm_ctermid = SCM function();
 	alias da_scm_tcgetpgrp = SCM function(SCM port);
 	alias da_scm_tcsetpgrp = SCM function(SCM port, SCM pgid);
 
@@ -1524,6 +1622,8 @@ extern(C) @nogc nothrow {
 	alias da_scm_sendto = SCM function(SCM sock, SCM message, SCM fam, SCM address, SCM args_and_flags);
 
 	//7.2.12 System Identification
+	alias da_scm_uname = SCM function();
+	alias da_scm_gethostname = SCM function();
 	alias da_scm_sethostname = SCM function(SCM name);
 
 	//7.2.13 Locales
@@ -1695,6 +1795,7 @@ __gshared {
 
 	//6.4 Initializing Guile
 	da_scm_with_guile scm_with_guile;
+	da_scm_init_guile scm_init_guile;
 	da_scm_boot_guile scm_boot_guile;
 	da_scm_shell scm_shell;
 
@@ -1748,6 +1849,8 @@ __gshared {
 	da_scm_inf_p scm_inf_p;
 	da_scm_nan_p scm_nan_p;
 	da_scm_finite_p scm_finite_p;
+	da_scm_nan scm_nan;
+	da_scm_inf scm_inf;
 	da_scm_numerator scm_numerator;
 	da_scm_denominator scm_denominator;
 	da_scm_is_real scm_is_real;
@@ -2097,6 +2200,9 @@ __gshared {
 	//6.6.5.15 String Internals
 	da_scm_string_bytes_per_char scm_string_bytes_per_char;
 	da_scm_sys_string_dump scm_sys_string_dump;
+
+	//6.6.6.1 Endianness
+	da_scm_native_endianness scm_native_endianness;
 
 	//6.6.6.2 Manipulating Bytevectors
 	da_scm_make_bytevector scm_make_bytevector;
@@ -2606,6 +2712,7 @@ __gshared {
 	//6.13.10 Dynamic Wind
 	da_scm_dynamic_wind scm_dynamic_wind;
 	da_scm_dynwind_begin scm_dynwind_begin;
+	da_scm_dynwind_end scm_dynwind_end;
 	da_scm_dynwind_unwind_handler scm_dynwind_unwind_handler;
 	da_scm_dynwind_unwind_handler_with_scm scm_dynwind_unwind_handler_with_scm;
 	da_scm_dynwind_rewind_handler scm_dynwind_rewind_handler;
@@ -2661,6 +2768,7 @@ __gshared {
 	da_scm_write_char scm_write_char;
 	da_scm_c_write scm_c_write;
 	da_scm_force_output scm_force_output;
+	da_scm_flush_all_ports scm_flush_all_ports;
 
 	//6.14.4 Closing
 	da_scm_close_port scm_close_port;
@@ -2683,6 +2791,9 @@ __gshared {
 	da_scm_write_string_partial scm_write_string_partial;
 
 	//6.14.8 Default Ports for Input, Output and Errors
+	da_scm_current_input_port scm_current_input_port;
+	da_scm_current_output_port scm_current_output_port;
+	da_scm_current_error_port scm_current_error_port;
 	da_scm_set_current_input_port scm_set_current_input_port;
 	da_scm_set_current_output_port scm_set_current_output_port;
 	da_scm_set_current_error_port scm_set_current_error_port;
@@ -2702,6 +2813,7 @@ __gshared {
 	da_scm_call_with_output_string scm_call_with_output_string;
 	da_scm_call_with_input_string scm_call_with_input_string;
 	da_scm_open_input_string scm_open_input_string;
+	da_scm_open_output_string scm_open_output_string;
 	da_scm_get_output_string scm_get_output_string;
 
 	//6.14.9.3 Soft Ports
@@ -2712,6 +2824,7 @@ __gshared {
 
 	//6.14.10.5 The End-of-File Object
 	da_scm_eof_object_p scm_eof_object_p;
+	da_scm_eof_object scm_eof_object;
 
 	//6.14.10.8 Binary Input
 	da_scm_open_bytevector_input_port scm_open_bytevector_input_port;
@@ -2743,6 +2856,7 @@ __gshared {
 
 	//6.17.4 Procedures for On the Fly Evaluation
 	da_scm_eval scm_eval;
+	da_scm_interaction_environment scm_interaction_environment;
 	da_scm_eval_string scm_eval_string;
 	da_scm_eval_string_in_module scm_eval_string_in_module;
 	da_scm_c_eval_string scm_c_eval_string;
@@ -2769,6 +2883,7 @@ __gshared {
 	//6.17.6 Loading Scheme Code from File
 	da_scm_primitive_load scm_primitive_load;
 	da_scm_c_primitive_load scm_c_primitive_load;
+	da_scm_current_load_port scm_current_load_port;
 
 	//6.17.7 Load Paths
 	da_scm_primitive_load_path scm_primitive_load_path;
@@ -2788,9 +2903,12 @@ __gshared {
 	da_scm_local_eval scm_local_eval;
 
 	//6.18.1 Function related to Garbage Collection
+	da_scm_gc scm_gc;
 	da_scm_gc_protect_object scm_gc_protect_object;
 	da_scm_gc_unprotect_object scm_gc_unprotect_object;
 	da_scm_permanent_object scm_permanent_object;
+	da_scm_gc_stats scm_gc_stats;
+	da_scm_gc_live_object_stats scm_gc_live_object_stats;
 
 	//6.18.2 Memory Blocks
 	da_scm_malloc scm_malloc;
@@ -2818,7 +2936,11 @@ __gshared {
 	da_scm_weak_vector_ref scm_weak_vector_ref;
 	da_scm_weak_vector_set_x scm_weak_vector_set_x;
 
+	//6.18.4 Guardians
+	da_scm_make_guardian scm_make_guardian;
+
 	//6.19.7 Variables
+	da_scm_make_undefined_variable scm_make_undefined_variable;
 	da_scm_make_variable scm_make_variable;
 	da_scm_variable_bound_p scm_variable_bound_p;
 	da_scm_variable_ref scm_variable_ref;
@@ -2827,6 +2949,7 @@ __gshared {
 	da_scm_variable_p scm_variable_p;
 
 	//6.19.8 Module System Reflection
+	da_scm_current_module scm_current_module;
 	da_scm_set_current_module scm_set_current_module;
 	da_scm_resolve_module scm_resolve_module;
 
@@ -2899,6 +3022,8 @@ __gshared {
 	da_scm_c_call_with_blocked_asyncs scm_c_call_with_blocked_asyncs;
 	da_scm_call_with_unblocked_asyncs scm_call_with_unblocked_asyncs;
 	da_scm_c_call_with_unblocked_asyncs scm_c_call_with_unblocked_asyncs;
+	da_scm_dynwind_block_asyncs scm_dynwind_block_asyncs;
+	da_scm_dynwind_unblock_asyncs scm_dynwind_unblock_asyncs;
 
 	//6.21.2.2 User asyncs
 	da_scm_async scm_async;
@@ -2916,6 +3041,7 @@ __gshared {
 	da_scm_thread_cleanup scm_thread_cleanup;
 
 	//6.21.4 Mutexes and Condition Variables
+	da_scm_make_mutex scm_make_mutex;
 	da_scm_make_mutex_with_flags scm_make_mutex_with_flags;
 	da_scm_mutex_p scm_mutex_p;
 	da_scm_lock_mutex scm_lock_mutex;
@@ -2927,6 +3053,7 @@ __gshared {
 	da_scm_mutex_owner scm_mutex_owner;
 	da_scm_mutex_level scm_mutex_level;
 	da_scm_mutex_locked_p scm_mutex_locked_p;
+	da_scm_make_condition_variable scm_make_condition_variable;
 	da_scm_condition_variable_p scm_condition_variable_p;
 	da_scm_wait_condition_variable scm_wait_condition_variable;
 	da_scm_signal_condition_variable scm_signal_condition_variable;
@@ -2947,7 +3074,9 @@ __gshared {
 	da_scm_dynwind_critical_section scm_dynwind_critical_section;
 
 	//6.21.7 Fluids and Dynamic States
+	da_scm_make_fluid scm_make_fluid;
 	da_scm_make_fluid_with_default scm_make_fluid_with_default;
+	da_scm_make_unbound_fluid scm_make_unbound_fluid;
 	da_scm_fluid_p scm_fluid_p;
 	da_scm_fluid_ref scm_fluid_ref;
 	da_scm_fluid_set_x scm_fluid_set_x;
@@ -2960,8 +3089,20 @@ __gshared {
 	da_scm_dynwind_fluid scm_dynwind_fluid;
 	da_scm_make_dynamic_state scm_make_dynamic_state;
 	da_scm_dynamic_state_p scm_dynamic_state_p;
+	da_scm_current_dynamic_state scm_current_dynamic_state;
 	da_scm_set_current_dynamic_state scm_set_current_dynamic_state;
 	da_scm_with_dynamic_state scm_with_dynamic_state;
+
+	//6.22.1 Configuration, Build and Installation
+	da_scm_version scm_version;
+	da_scm_effective_version scm_effective_version;
+	da_scm_major_version scm_major_version;
+	da_scm_minor_version scm_minor_version;
+	da_scm_micro_version scm_micro_version;
+	da_scm_sys_package_data_dir scm_sys_package_data_dir;
+	da_scm_sys_library_dir scm_sys_library_dir;
+	da_scm_sys_site_dir scm_sys_site_dir;
+	da_scm_sys_site_ccache_dir scm_sys_site_cache_dir;
 
 	//6.22.2.1 Feature Manipulation
 	da_scm_add_feature scm_add_feature;
@@ -3029,6 +3170,7 @@ __gshared {
 
 	//6.25.3.3 Pre-Unwind Debugging
 	da_scm_backtrace_with_highlights scm_backtrace_with_highlights;
+	da_scm_backtrace scm_backtrace;
 
 	//7.2.2 Ports and File Descriptors
 	da_scm_port_revealed scm_port_revealed;
@@ -3042,6 +3184,7 @@ __gshared {
 	da_scm_open_fdes scm_open_fdes;
 	da_scm_close scm_close;
 	da_scm_close_fdes scm_close_fdes;
+	da_scm_pipe scm_pipe;
 	da_scm_dup_to_fdes scm_dup_to_fdes;
 	da_scm_redirect_port scm_redirect_port;
 	da_scm_dup2 scm_dup2;
@@ -3073,8 +3216,11 @@ __gshared {
 	da_scm_readdir scm_readdir;
 	da_scm_rewinddir scm_rewinddir;
 	da_scm_closedir scm_closedir;
+	da_scm_sync scm_sync;
 	da_scm_mknod scm_mknod;
+	da_scm_tmpnam scm_tmpnam;
 	da_scm_mkstemp scm_mkstemp;
+	da_scm_tmpfile scm_tmpfile;
 	da_scm_dirname scm_dirname;
 	da_scm_basename scm_basename;
 
@@ -3083,15 +3229,23 @@ __gshared {
 	da_scm_getpwuid scm_getpwuid;
 	da_scm_setgrent scm_setgrent;
 	da_scm_getgrgid scm_getgrgid;
+	da_scm_getlogin scm_getlogin;
 
 	//7.2.5 Time
+	da_scm_current_time scm_current_time;
+	da_scm_gettimeofday scm_gettimeofday;
 	da_scm_localtime scm_localtime;
 	da_scm_gmtime scm_gmtime;
 	da_scm_mktime scm_mktime;
+	da_scm_tzset scm_tzset;
 	da_scm_strftime scm_strftime;
 	da_scm_strptime scm_strptime;
+	da_scm_times scm_times;
+	da_scm_get_internal_real_time scm_get_internal_real_time;
+	da_scm_get_internal_run_time scm_get_internal_run_time;
 
 	//7.2.6 Runtime Environment
+	da_scm_program_arguments scm_program_arguments;
 	da_scm_set_program_arguments_scm scm_set_program_arguments_scm;
 	da_scm_set_program_arguments scm_set_program_arguments;
 	da_scm_getenv scm_getenv;
@@ -3100,14 +3254,24 @@ __gshared {
 
 	//7.2.7 Processes
 	da_scm_chdir scm_chdir;
+	da_scm_getcwd scm_getcwd;
 	da_scm_umask scm_umask;
 	da_scm_chroot scm_chroot;
+	da_scm_getpid scm_getpid;
+	da_scm_getgroups scm_getgroups;
+	da_scm_getppid scm_getppid;
+	da_scm_getuid scm_getuid;
+	da_scm_getgid scm_getgid;
+	da_scm_geteuid scm_geteuid;
+	da_scm_getegid scm_getegid;
 	da_scm_setgroups scm_setgroups;
 	da_scm_setuid scm_setuid;
 	da_scm_setgid scm_setgid;
 	da_scm_seteuid scm_seteuid;
 	da_scm_setegid scm_setegid;
+	da_scm_getpgrp scm_getpgrp;
 	da_scm_setpgid scm_setpgid;
+	da_scm_setsid scm_setsid;
 	da_scm_getsid scm_getsid;
 	da_scm_waitpid scm_waitpid;
 	da_scm_status_exit_val scm_status_exit_val;
@@ -3120,11 +3284,14 @@ __gshared {
 	da_scm_execl scm_execl;
 	da_scm_execlp scm_execlp;
 	da_scm_execle scm_execle;
+	da_scm_fork scm_fork;
 	da_scm_nice scm_nice;
 	da_scm_setpriority scm_setpriority;
 	da_scm_getpriority scm_getpriority;
 	da_scm_getaffinity scm_getaffinity;
 	da_scm_setaffinity scm_setaffinity;
+	da_scm_total_processor_count scm_total_processor_count;
+	da_scm_current_processor_count scm_current_processor_count;
 
 	//7.2.8 Signals
 	da_scm_kill scm_kill;
@@ -3132,6 +3299,7 @@ __gshared {
 	da_scm_sigaction scm_sigaction;
 	da_scm_sigaction_for_thread scm_sigaction_for_thread;
 	da_scm_alarm scm_alarm;
+	da_scm_pause scm_pause;
 	da_scm_sleep scm_sleep;
 	da_scm_usleep scm_usleep;
 	da_scm_getitimer scm_getitimer;
@@ -3140,6 +3308,7 @@ __gshared {
 	//7.2.9 Terminals and Ptys
 	da_scm_isatty_p scm_isatty_p;
 	da_scm_ttyname scm_ttyname;
+	da_scm_ctermid scm_ctermid;
 	da_scm_tcgetpgrp scm_tcgetpgrp;
 	da_scm_tcsetpgrp scm_tcsetpgrp;
 
@@ -3187,6 +3356,8 @@ __gshared {
 	da_scm_sendto scm_sendto;
 
 	//7.2.12 System Identification
+	da_scm_uname scm_uname;
+	da_scm_gethostname scm_gethostname;
 	da_scm_sethostname scm_sethostname;
 
 	//7.2.13 Locales
@@ -3364,6 +3535,7 @@ class DerelictGuileLoader : SharedLibLoader {
 
 		//6.4 Initializing Guile
 		bindFunc(cast(void**)&scm_with_guile, "scm_with_guile");
+		bindFunc(cast(void**)&scm_init_guile, "scm_init_guile");
 		bindFunc(cast(void**)&scm_boot_guile, "scm_boot_guile");
 		bindFunc(cast(void**)&scm_shell, "scm_shell");
 
@@ -3417,6 +3589,8 @@ class DerelictGuileLoader : SharedLibLoader {
 		bindFunc(cast(void**)&scm_inf_p, "scm_inf_p");
 		bindFunc(cast(void**)&scm_nan_p, "scm_nan_p");
 		bindFunc(cast(void**)&scm_finite_p, "scm_finite_p");
+		bindFunc(cast(void**)&scm_inf, "scm_inf");
+		bindFunc(cast(void**)&scm_nan, "scm_nan");
 		bindFunc(cast(void**)&scm_numerator, "scm_numerator");
 		bindFunc(cast(void**)&scm_denominator, "scm_denominator");
 		bindFunc(cast(void**)&scm_is_real, "scm_is_real");
@@ -3536,6 +3710,7 @@ class DerelictGuileLoader : SharedLibLoader {
 		bindFunc(cast(void**)&scm_seed_to_random_state, "scm_seed_to_random_state");
 		bindFunc(cast(void**)&scm_datum_to_random_state, "scm_datum_to_random_state");
 		bindFunc(cast(void**)&scm_random_state_to_datum, "scm_random_state_to_datum");
+		bindFunc(cast(void**)&scm_random_state_from_platform, "scm_random_state_from_platform");
 
 		//6.6.3 Characters
 		bindFunc(cast(void**)&scm_char_p, "scm_char_p");
@@ -4276,6 +4451,7 @@ class DerelictGuileLoader : SharedLibLoader {
 		//6.13.10 Dynamic Wind
 		bindFunc(cast(void**)&scm_dynamic_wind, "scm_dynamic_wind");
 		bindFunc(cast(void**)&scm_dynwind_begin, "scm_dynwind_begin");
+		bindFunc(cast(void**)&scm_dynwind_end, "scm_dynwind_end");
 		bindFunc(cast(void**)&scm_dynwind_unwind_handler, "scm_dynwind_unwind_handler");
 		bindFunc(cast(void**)&scm_dynwind_unwind_handler_with_scm, "scm_dynwind_unwind_handler_with_scm");
 		bindFunc(cast(void**)&scm_dynwind_rewind_handler, "scm_dynwind_rewind_handler");
@@ -4311,7 +4487,6 @@ class DerelictGuileLoader : SharedLibLoader {
 		bindFunc(cast(void**)&scm_port_conversion_strategy, "scm_port_conversion_strategy");
 
 		//6.14.2 Reading
-		bindFunc(cast(void**)&scm_eof_object_p, "scm_eof_object_p");
 		bindFunc(cast(void**)&scm_char_ready_p, "scm_char_ready_p");
 		bindFunc(cast(void**)&scm_read_char, "scm_read_char");
 		bindFunc(cast(void**)&scm_c_read, "scm_c_read");
@@ -4332,6 +4507,7 @@ class DerelictGuileLoader : SharedLibLoader {
 		bindFunc(cast(void**)&scm_write_char, "scm_write_char");
 		bindFunc(cast(void**)&scm_c_write, "scm_c_write");
 		bindFunc(cast(void**)&scm_force_output, "scm_force_output");
+		bindFunc(cast(void**)&scm_flush_all_ports, "scm_flush_all_ports");
 
 		//6.14.4 Closing
 		bindFunc(cast(void**)&scm_close_port, "scm_close_port");
@@ -4354,6 +4530,9 @@ class DerelictGuileLoader : SharedLibLoader {
 		bindFunc(cast(void**)&scm_write_string_partial, "scm_write_string_partial");
 
 		//6.14.8 Default Ports for Input, Output and Errors
+		bindFunc(cast(void**)&scm_current_input_port, "scm_current_input_port");
+		bindFunc(cast(void**)&scm_current_output_port, "scm_current_output_port");
+		bindFunc(cast(void**)&scm_current_error_port, "scm_current_error_port");
 		bindFunc(cast(void**)&scm_set_current_input_port, "scm_set_current_input_port");
 		bindFunc(cast(void**)&scm_set_current_output_port, "scm_set_current_output_port");
 		bindFunc(cast(void**)&scm_set_current_error_port, "scm_set_current_error_port");
@@ -4373,6 +4552,7 @@ class DerelictGuileLoader : SharedLibLoader {
 		bindFunc(cast(void**)&scm_call_with_output_string, "scm_call_with_output_string");
 		bindFunc(cast(void**)&scm_call_with_input_string, "scm_call_with_input_string");
 		bindFunc(cast(void**)&scm_open_input_string, "scm_open_input_string");
+		bindFunc(cast(void**)&scm_open_output_string, "scm_open_output_string");
 		bindFunc(cast(void**)&scm_get_output_string, "scm_get_output_string");
 
 		//6.14.9.3 Soft Ports
@@ -4382,6 +4562,7 @@ class DerelictGuileLoader : SharedLibLoader {
 		bindFunc(cast(void**)&scm_sys_make_void_port, "scm_sys_make_void_port");
 
 		//6.14.10.5 The End-of-File Object
+		bindFunc(cast(void**)&scm_eof_object, "scm_eof_object");
 		bindFunc(cast(void**)&scm_eof_object_p, "scm_eof_object_p");
 
 		//6.14.10.8 Binary Input
@@ -4414,6 +4595,7 @@ class DerelictGuileLoader : SharedLibLoader {
 
 		//6.17.4 Procedures for On the Fly Evaluation
 		bindFunc(cast(void**)&scm_eval, "scm_eval");
+		bindFunc(cast(void**)&scm_interaction_environment, "scm_interaction_environment");
 		bindFunc(cast(void**)&scm_eval_string, "scm_eval_string");
 		bindFunc(cast(void**)&scm_eval_string_in_module, "scm_eval_string_in_module");
 		bindFunc(cast(void**)&scm_c_eval_string, "scm_c_eval_string");
@@ -4440,6 +4622,7 @@ class DerelictGuileLoader : SharedLibLoader {
 		//6.17.6 Loading Scheme Code from File
 		bindFunc(cast(void**)&scm_primitive_load, "scm_primitive_load");
 		bindFunc(cast(void**)&scm_c_primitive_load, "scm_c_primitive_load");
+		bindFunc(cast(void**)&scm_current_load_port, "scm_current_load_port");
 
 		//6.17.7 Load Paths
 		bindFunc(cast(void**)&scm_primitive_load_path, "scm_primitive_load_path");
@@ -4459,9 +4642,12 @@ class DerelictGuileLoader : SharedLibLoader {
 		bindFunc(cast(void**)&scm_local_eval, "scm_local_eval");
 
 		//6.18.1 Function related to Garbage Collection
+		bindFunc(cast(void**)&scm_gc, "scm_gc");
 		bindFunc(cast(void**)&scm_gc_protect_object, "scm_gc_protect_object");
 		bindFunc(cast(void**)&scm_gc_unprotect_object, "scm_gc_unprotect_object");
 		bindFunc(cast(void**)&scm_permanent_object, "scm_permanent_object");
+		bindFunc(cast(void**)&scm_gc_stats, "scm_gc_stats");
+		bindFunc(cast(void**)&scm_gc_live_object_stats, "scm_gc_live_object_stats");
 
 		//6.18.2 Memory Blocks
 		bindFunc(cast(void**)&scm_malloc, "scm_malloc");
@@ -4490,7 +4676,11 @@ class DerelictGuileLoader : SharedLibLoader {
 		bindFunc(cast(void**)&scm_weak_vector_ref, "scm_weak_vector_ref");
 		bindFunc(cast(void**)&scm_weak_vector_set_x, "scm_weak_vector_set_x");
 
+		//6.18.4 Guardians
+		bindFunc(cast(void**)&scm_make_guardian, "scm_make_guardian");
+
 		//6.19.7 Variables
+		bindFunc(cast(void**)&scm_make_undefined_variable, "scm_make_undefined_variable");
 		bindFunc(cast(void**)&scm_make_variable, "scm_make_variable");
 		bindFunc(cast(void**)&scm_variable_bound_p, "scm_variable_bound_p");
 		bindFunc(cast(void**)&scm_variable_ref, "scm_variable_ref");
@@ -4499,6 +4689,7 @@ class DerelictGuileLoader : SharedLibLoader {
 		bindFunc(cast(void**)&scm_variable_p, "scm_variable_p");
 
 		//6.19.8 Module System Reflection
+		bindFunc(cast(void**)&scm_current_module, "scm_current_module");
 		bindFunc(cast(void**)&scm_set_current_module, "scm_set_current_module");
 		bindFunc(cast(void**)&scm_resolve_module, "scm_resolve_module");
 
@@ -4571,6 +4762,8 @@ class DerelictGuileLoader : SharedLibLoader {
 		bindFunc(cast(void**)&scm_c_call_with_blocked_asyncs, "scm_c_call_with_blocked_asyncs");
 		bindFunc(cast(void**)&scm_call_with_unblocked_asyncs, "scm_call_with_unblocked_asyncs");
 		bindFunc(cast(void**)&scm_c_call_with_unblocked_asyncs, "scm_c_call_with_unblocked_asyncs");
+		bindFunc(cast(void**)&scm_dynwind_block_asyncs, "scm_dynwind_block_asyncs");
+		bindFunc(cast(void**)&scm_dynwind_unblock_asyncs, "scm_dynwind_unblock_asyncs");
 
 		//6.21.2.2 User asyncs
 		bindFunc(cast(void**)&scm_async, "scm_async");
@@ -4578,6 +4771,8 @@ class DerelictGuileLoader : SharedLibLoader {
 		bindFunc(cast(void**)&scm_run_asyncs, "scm_run_asyncs");
 
 		//6.21.3 Threads
+		bindFunc(cast(void**)&scm_all_threads, "scm_all_threads");
+		bindFunc(cast(void**)&scm_current_thread, "scm_current_thread");
 		bindFunc(cast(void**)&scm_spawn_thread, "scm_spawn_thread");
 		bindFunc(cast(void**)&scm_thread_p, "scm_thread_p");
 		bindFunc(cast(void**)&scm_join_thread, "scm_join_thread");
@@ -4588,6 +4783,7 @@ class DerelictGuileLoader : SharedLibLoader {
 		bindFunc(cast(void**)&scm_thread_cleanup, "scm_thread_cleanup");
 
 		//6.21.4 Mutexes and Condition Variables
+		bindFunc(cast(void**)&scm_make_mutex, "scm_make_mutex");
 		bindFunc(cast(void**)&scm_make_mutex_with_flags, "scm_make_mutex_with_flags");
 		bindFunc(cast(void**)&scm_mutex_p, "scm_mutex_p");
 		bindFunc(cast(void**)&scm_lock_mutex, "scm_lock_mutex");
@@ -4599,6 +4795,7 @@ class DerelictGuileLoader : SharedLibLoader {
 		bindFunc(cast(void**)&scm_mutex_owner, "scm_mutex_owner");
 		bindFunc(cast(void**)&scm_mutex_level, "scm_mutex_level");
 		bindFunc(cast(void**)&scm_mutex_locked_p, "scm_mutex_locked_p");
+		bindFunc(cast(void**)&scm_make_condition_variable, "scm_make_condition_variable");
 		bindFunc(cast(void**)&scm_condition_variable_p, "scm_condition_variable_p");
 		bindFunc(cast(void**)&scm_wait_condition_variable, "scm_wait_condition_variable");
 		bindFunc(cast(void**)&scm_signal_condition_variable, "scm_signal_condition_variable");
@@ -4619,7 +4816,9 @@ class DerelictGuileLoader : SharedLibLoader {
 		bindFunc(cast(void**)&scm_dynwind_critical_section, "scm_dynwind_critical_section");
 
 		//6.21.7 Fluids and Dynamic States
+		bindFunc(cast(void**)&scm_make_fluid, "scm_make_fluid");
 		bindFunc(cast(void**)&scm_make_fluid_with_default, "scm_make_fluid_with_default");
+		bindFunc(cast(void**)&scm_make_unbound_fluid, "scm_make_unbound_fluid");
 		bindFunc(cast(void**)&scm_fluid_p, "scm_fluid_p");
 		bindFunc(cast(void**)&scm_fluid_ref, "scm_fluid_ref");
 		bindFunc(cast(void**)&scm_fluid_set_x, "scm_fluid_set_x");
@@ -4632,8 +4831,20 @@ class DerelictGuileLoader : SharedLibLoader {
 		bindFunc(cast(void**)&scm_dynwind_fluid, "scm_dynwind_fluid");
 		bindFunc(cast(void**)&scm_make_dynamic_state, "scm_make_dynamic_state");
 		bindFunc(cast(void**)&scm_dynamic_state_p, "scm_dynamic_state_p");
+		bindFunc(cast(void**)&scm_current_dynamic_state, "scm_current_dynamic_state");
 		bindFunc(cast(void**)&scm_set_current_dynamic_state, "scm_set_current_dynamic_state");
 		bindFunc(cast(void**)&scm_with_dynamic_state, "scm_with_dynamic_state");
+
+		//6.22.1 Configuration, Build and Installation
+		bindFunc(cast(void**)&scm_version, "scm_version");
+		bindFunc(cast(void**)&scm_effective_version, "scm_effective_version");
+		bindFunc(cast(void**)&scm_major_version, "scm_major_version");
+		bindFunc(cast(void**)&scm_minor_version, "scm_minor_version");
+		bindFunc(cast(void**)&scm_micro_version, "scm_micro_version");
+		bindFunc(cast(void**)&scm_sys_package_data_dir, "scm_sys_package_data_dir");
+		bindFunc(cast(void**)&scm_sys_library_dir, "scm_sys_library_dir");
+		bindFunc(cast(void**)&scm_sys_site_dir, "scm_sys_site_dir");
+		bindFunc(cast(void**)&scm_sys_site_ccache_dir, "scm_sys_site_ccache_dir");
 
 		//6.22.2.1 Feature Manipulation
 		bindFunc(cast(void**)&scm_add_feature, "scm_add_feature");
@@ -4701,6 +4912,7 @@ class DerelictGuileLoader : SharedLibLoader {
 
 		//6.25.3.3 Pre-Unwind Debugging
 		bindFunc(cast(void**)&scm_backtrace_with_highlights, "scm_backtrace_with_highlights");
+		bindFunc(cast(void**)&scm_backtrace, "scm_backtrace");
 
 		//7.2.2 Ports and File Descriptors
 		bindFunc(cast(void**)&scm_port_revealed, "scm_port_revealed");
@@ -4714,7 +4926,7 @@ class DerelictGuileLoader : SharedLibLoader {
 		bindFunc(cast(void**)&scm_open_fdes, "scm_open_fdes");
 		bindFunc(cast(void**)&scm_close, "scm_close");
 		bindFunc(cast(void**)&scm_close_fdes, "scm_close_fdes");
-		bindFunc(cast(void**)&scm_unread_char, "scm_unread_char");
+		bindFunc(cast(void**)&scm_pipe, "scm_pipe");
 		bindFunc(cast(void**)&scm_dup_to_fdes, "scm_dup_to_fdes");
 		bindFunc(cast(void**)&scm_redirect_port, "scm_redirect_port");
 		bindFunc(cast(void**)&scm_dup2, "scm_dup2");
@@ -4746,8 +4958,11 @@ class DerelictGuileLoader : SharedLibLoader {
 		bindFunc(cast(void**)&scm_readdir, "scm_readdir");
 		bindFunc(cast(void**)&scm_rewinddir, "scm_rewinddir");
 		bindFunc(cast(void**)&scm_closedir, "scm_closedir");
+		bindFunc(cast(void**)&scm_sync, "scm_sync");
 		bindFunc(cast(void**)&scm_mknod, "scm_mknod");
+		bindFunc(cast(void**)&scm_tmpnam, "scm_tmpnam");
 		bindFunc(cast(void**)&scm_mkstemp, "scm_mkstemp");
+		bindFunc(cast(void**)&scm_tmpfile, "scm_tmpfile");
 		bindFunc(cast(void**)&scm_dirname, "scm_dirname");
 		bindFunc(cast(void**)&scm_basename, "scm_basename");
 
@@ -4756,15 +4971,23 @@ class DerelictGuileLoader : SharedLibLoader {
 		bindFunc(cast(void**)&scm_getpwuid, "scm_getpwuid");
 		bindFunc(cast(void**)&scm_setgrent, "scm_setgrent");
 		bindFunc(cast(void**)&scm_getgrgid, "scm_getgrgid");
+		bindFunc(cast(void**)&scm_getlogin, "scm_getlogin");
 
 		//7.2.5 Time
+		bindFunc(cast(void**)&scm_current_time, "scm_current_time");
+		bindFunc(cast(void**)&scm_gettimeofday, "scm_gettimeofday");
 		bindFunc(cast(void**)&scm_localtime, "scm_localtime");
 		bindFunc(cast(void**)&scm_gmtime, "scm_gmtime");
 		bindFunc(cast(void**)&scm_mktime, "scm_mktime");
+		bindFunc(cast(void**)&scm_tzset, "scm_tzset");
 		bindFunc(cast(void**)&scm_strftime, "scm_strftime");
 		bindFunc(cast(void**)&scm_strptime, "scm_strptime");
+		bindFunc(cast(void**)&scm_times, "scm_times");
+		bindFunc(cast(void**)&scm_get_internal_real_time, "scm_get_internal_real_time");
+		bindFunc(cast(void**)&scm_get_internal_run_time, "scm_get_internal_run_time");
 
 		//7.2.6 Runtime Environment
+		bindFunc(cast(void**)&scm_program_arguments, "scm_program_arguments");
 		bindFunc(cast(void**)&scm_set_program_arguments_scm, "scm_set_program_arguments_scm");
 		bindFunc(cast(void**)&scm_set_program_arguments, "scm_set_program_arguments");
 		bindFunc(cast(void**)&scm_getenv, "scm_getenv");
@@ -4773,14 +4996,24 @@ class DerelictGuileLoader : SharedLibLoader {
 
 		//7.2.7 Processes
 		bindFunc(cast(void**)&scm_chdir, "scm_chdir");
+		bindFunc(cast(void**)&scm_getcwd, "scm_getcwd");
 		bindFunc(cast(void**)&scm_umask, "scm_umask");
 		bindFunc(cast(void**)&scm_chroot, "scm_chroot");
+		bindFunc(cast(void**)&scm_getpid, "scm_getpid");
+		bindFunc(cast(void**)&scm_getgroups, "scm_getgroups");
+		bindFunc(cast(void**)&scm_getppid, "scm_getppid");
+		bindFunc(cast(void**)&scm_getuid, "scm_getuid");
+		bindFunc(cast(void**)&scm_getgid, "scm_getgid");
+		bindFunc(cast(void**)&scm_geteuid, "scm_geteuid");
+		bindFunc(cast(void**)&scm_getegid, "scm_getegid");
 		bindFunc(cast(void**)&scm_setgroups, "scm_setgroups");
 		bindFunc(cast(void**)&scm_setuid, "scm_setuid");
 		bindFunc(cast(void**)&scm_setgid, "scm_setgid");
 		bindFunc(cast(void**)&scm_seteuid, "scm_seteuid");
 		bindFunc(cast(void**)&scm_setegid, "scm_setegid");
+		bindFunc(cast(void**)&scm_getpgrp, "scm_getpgrp");
 		bindFunc(cast(void**)&scm_setpgid, "scm_setpgid");
+		bindFunc(cast(void**)&scm_setsid, "scm_setsid");
 		bindFunc(cast(void**)&scm_getsid, "scm_getsid");
 		bindFunc(cast(void**)&scm_waitpid, "scm_waitpid");
 		bindFunc(cast(void**)&scm_status_exit_val, "scm_status_exit_val");
@@ -4793,11 +5026,14 @@ class DerelictGuileLoader : SharedLibLoader {
 		bindFunc(cast(void**)&scm_execl, "scm_execl");
 		bindFunc(cast(void**)&scm_execlp, "scm_execlp");
 		bindFunc(cast(void**)&scm_execle, "scm_execle");
+		bindFunc(cast(void**)&scm_fork, "scm_fork");
 		bindFunc(cast(void**)&scm_nice, "scm_nice");
 		bindFunc(cast(void**)&scm_setpriority, "scm_setpriority");
 		bindFunc(cast(void**)&scm_getpriority, "scm_getpriority");
 		bindFunc(cast(void**)&scm_getaffinity, "scm_getaffinity");
 		bindFunc(cast(void**)&scm_setaffinity, "scm_setaffinity");
+		bindFunc(cast(void**)&scm_total_processor_count, "scm_total_processor_count");
+		bindFunc(cast(void**)&scm_current_processor_count, "scm_current_processor_count");
 
 		//7.2.8 Signals
 		bindFunc(cast(void**)&scm_kill, "scm_kill");
@@ -4805,6 +5041,7 @@ class DerelictGuileLoader : SharedLibLoader {
 		bindFunc(cast(void**)&scm_sigaction, "scm_sigaction");
 		bindFunc(cast(void**)&scm_sigaction_for_thread, "scm_sigaction_for_thread");
 		bindFunc(cast(void**)&scm_alarm, "scm_alarm");
+		bindFunc(cast(void**)&scm_pause, "scm_pause");
 		bindFunc(cast(void**)&scm_sleep, "scm_sleep");
 		bindFunc(cast(void**)&scm_usleep, "scm_usleep");
 		bindFunc(cast(void**)&scm_getitimer, "scm_getitimer");
@@ -4813,6 +5050,7 @@ class DerelictGuileLoader : SharedLibLoader {
 		//7.2.9 Terminals and Ptys
 		bindFunc(cast(void**)&scm_isatty_p, "scm_isatty_p");
 		bindFunc(cast(void**)&scm_ttyname, "scm_ttyname");
+		bindFunc(cast(void**)&scm_ctermid, "scm_ctermid")
 		bindFunc(cast(void**)&scm_tcgetpgrp, "scm_tcgetpgrp");
 		bindFunc(cast(void**)&scm_tcsetpgrp, "scm_tcsetpgrp");
 
@@ -4860,6 +5098,8 @@ class DerelictGuileLoader : SharedLibLoader {
 		bindFunc(cast(void**)&scm_sendto, "scm_sendto");
 
 		//7.2.12 System Identification
+		bindFunc(cast(void**)&scm_uname, "scm_uname");
+		bindFunc(cast(void**)&scm_gethostname, "scm_gethostname")
 		bindFunc(cast(void**)&scm_sethostname, "scm_sethostname");
 
 		//7.2.13 Locales
