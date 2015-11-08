@@ -3014,8 +3014,6 @@ __gshared {
 	da_scm_try_arbiter scm_try_arbiter;
 	da_scm_release_arbiter scm_release_arbiter;
 
-	//6.21.2 Asyncs
-
 	//6.21.2.1 System asyncs
 	da_scm_system_async_mark scm_system_async_mark;
 	da_scm_system_async_mark_for_thread scm_system_async_mark_for_thread;
@@ -3536,6 +3534,33 @@ class DerelictGuileLoader : SharedLibLoader {
 
 	protected override void loadSymbols() {
 
+		/* Global Variables */
+
+		//6.6.4.6 Standard Character Sets
+		bindFunc(cast(void**)&scm_char_set_lower_case, "scm_char_set_lower_case");
+		bindFunc(cast(void**)&scm_char_set_upper_case, "scm_char_set_upper_case");
+		bindFunc(cast(void**)&scm_char_set_title_case, "scm_char_set_title_case");
+		bindFunc(cast(void**)&scm_char_set_letter, "scm_char_set_letter");
+		bindFunc(cast(void**)&scm_char_set_digit, "scm_char_set_digit");
+		bindFunc(cast(void**)&scm_char_set_letter_and_digit, "scm_char_set_letter_and_digit");
+		bindFunc(cast(void**)&scm_char_set_graphic, "scm_char_set_graphic");
+		bindFunc(cast(void**)&scm_char_set_printing, "scm_char_set_printing");
+		bindFunc(cast(void**)&scm_char_set_whitespace, "scm_char_set_whitespace");
+		bindFunc(cast(void**)&scm_char_set_blank, "scm_char_set_blank");
+		bindFunc(cast(void**)&scm_char_set_iso_control, "scm_char_set_iso_control");
+		bindFunc(cast(void**)&scm_char_set_punctuation, "scm_char_set_punctuation");
+		bindFunc(cast(void**)&scm_char_set_symbol, "scm_char_set_symbol");
+		bindFunc(cast(void**)&scm_char_set_hex_digit, "scm_char_set_hex_digit");
+		bindFunc(cast(void**)&scm_char_set_ascii, "scm_char_set_ascii");
+		bindFunc(cast(void**)&scm_char_set_empty, "scm_char_set_empty");
+		bindFunc(cast(void**)&scm_char_set_full, "scm_char_set_full");
+
+		//6.6.6.1 Endianness
+		bindFunc(cast(void**)&scm_endianness_big, "scm_endianness_big");
+		bindFunc(cast(void**)&scm_endianness_little, "scm_endianness_little");
+
+		/* Functions */
+
 		//6.4 Initializing Guile
 		bindFunc(cast(void**)&scm_with_guile, "scm_with_guile");
 		bindFunc(cast(void**)&scm_init_guile, "scm_init_guile");
@@ -3945,6 +3970,9 @@ class DerelictGuileLoader : SharedLibLoader {
 		//6.6.5.15 String Internals
 		bindFunc(cast(void**)&scm_string_bytes_per_char, "scm_string_bytes_per_char");
 		bindFunc(cast(void**)&scm_sys_string_dump, "scm_sys_string_dump");
+
+		//6.6.6.1 Endianness
+		bindFunc(cast(void**)&scm_native_endianness, "scm_native_endianness");
 
 		//6.6.6.2 Manipulating Bytevectors
 		bindFunc(cast(void**)&scm_make_bytevector, "scm_make_bytevector");
