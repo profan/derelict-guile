@@ -154,9 +154,9 @@ __gshared {
 
 	SCM scm_from_long(c_long x) {
 
-		static if (c_ulong.sizeof == 8) {
+		static if (c_long.sizeof == 8) {
 			return scm_from_int64(x);
-		} else static if (c_ulong.sizeof == 4) {
+		} else static if (c_long.sizeof == 4) {
 			return scm_from_int32(x);
 		}
 
@@ -200,8 +200,8 @@ __gshared {
 
 	}
 
-	SCM scm_from_ptrdiff_t(ptrdiff_t x) {	
-	
+	SCM scm_from_ptrdiff_t(ptrdiff_t x) {
+
 		static if (ssize_t.sizeof == 8) {
 			return scm_from_int64(x);
 		} else static if (ssize_t.sizeof == 4) {
